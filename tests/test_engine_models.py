@@ -4,8 +4,8 @@ from __future__ import annotations
 import json
 import unittest
 
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.models import (
+from pollux.engine.errors import EngineError
+from pollux.engine.models import (
     Event,
     normalize_timestamp,
     resolve_event_ref,

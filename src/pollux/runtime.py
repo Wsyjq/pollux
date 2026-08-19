@@ -9,8 +9,8 @@ import shutil
 import sys
 from pathlib import Path
 
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.storage import discover_mem_dir
+from pollux.engine.errors import EngineError
+from pollux.engine.storage import discover_mem_dir
 
 
 def resolve_python(value: str | None) -> Path:

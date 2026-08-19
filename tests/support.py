@@ -5,8 +5,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.storage import serialize_event
+from pollux.engine.models import Event
+from pollux.engine.storage import serialize_event
 
 CONFIG_DEFAULTS = 'summary_size_limit_kb = 20\nrecent_days = 30\nproject_description = ""\n'
 

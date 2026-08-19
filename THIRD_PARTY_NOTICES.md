@@ -2,7 +2,7 @@
 
 ## projectmem (format compatibility and design inspiration)
 
-Since 0.2.0, Agent Memory Guardrails does **not** depend on or vendor
+Since 0.2.0, Pollux does **not** depend on or vendor
 `projectmem`; the runtime dependency was removed when the engine became
 self-owned. The project remains an important acknowledgment:
 
@@ -15,7 +15,7 @@ The on-disk memory format (`.projectmem/` layout, six typed events, derived
 writes so memories move between engines without migration. The secret
 redaction patterns and the scoring/context heuristics were adapted from its
 MIT-licensed implementation, as was the general workflow design. Agent Memory
-Guardrails is not endorsed by the projectmem maintainers.
+Pollux is not endorsed by the projectmem maintainers.
 
 ## mcp
 

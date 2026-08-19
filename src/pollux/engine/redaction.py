@@ -60,7 +60,7 @@ def redact(text: str) -> tuple[str, list[str]]:
 
 
 def is_redaction_enabled() -> bool:
-    for var in ("AMGUARD_NO_REDACT", "PROJECTMEM_NO_REDACT"):
+    for var in ("POLLUX_NO_REDACT", "PROJECTMEM_NO_REDACT"):
         if os.environ.get(var, "").strip() in {"1", "true", "yes"}:
             return False
     return True

@@ -5,7 +5,7 @@ Differences from the historical hook installation, all deliberate:
 - The snippet never checks ``$PWD/.projectmem`` — that check is exactly why
   parent-anchored (family) memories never captured anything. The CLI does
   its own walk-up from the git repo root.
-- The amguard runtime is baked in as an absolute path next to the installing
+- The pollux runtime is baked in as an absolute path next to the installing
   interpreter, so a PATH-level install cannot drift versions.
 - Pre-commit is advisory (it prints, it does not block) — consistent with
   the governance layer's conservative defaults.
@@ -16,51 +16,51 @@ import os
 import sys
 from pathlib import Path
 
-from agent_memory_guardrails.files import GuardrailsFileError, set_marked_block
+from pollux.files import PolluxFileError, set_marked_block
 
-HOOK_MARKER_START = "# >>> amguard auto-capture >>>"
-HOOK_MARKER_END = "# <<< amguard auto-capture <<<"
+HOOK_MARKER_START = "# >>> pollux auto-capture >>>"
+HOOK_MARKER_END = "# <<< pollux auto-capture <<<"
 
 _HOOK_NAMES = ("pre-commit", "post-commit", "post-merge")
 
 _BASH_HEADER = "#!/usr/bin/env bash\n"
 
 _PRE_COMMIT_BLOCK = f"""{HOOK_MARKER_START}
-AMGUARD_BIN="${{AMGUARD_BIN:-__AMGUARD_ENTRY__}}"
-if command -v "$AMGUARD_BIN" >/dev/null 2>&1; then
-  "$AMGUARD_BIN" precheck --level block --root . || \\
-    echo "amguard: precheck flagged risk for staged files (advisory)"
+POLLUX_BIN="${{POLLUX_BIN:-__POLLUX_ENTRY__}}"
+if command -v "$POLLUX_BIN" >/dev/null 2>&1; then
+  "$POLLUX_BIN" precheck --level block --root . || \\
+    echo "pollux: precheck flagged risk for staged files (advisory)"
 fi
 {HOOK_MARKER_END}"""
 
 _POST_COMMIT_BLOCK = f"""{HOOK_MARKER_START}
-AMGUARD_BIN="${{AMGUARD_BIN:-__AMGUARD_ENTRY__}}"
-if command -v "$AMGUARD_BIN" >/dev/null 2>&1; then
-  "$AMGUARD_BIN" capture commit >/dev/null 2>&1 &
+POLLUX_BIN="${{POLLUX_BIN:-__POLLUX_ENTRY__}}"
+if command -v "$POLLUX_BIN" >/dev/null 2>&1; then
+  "$POLLUX_BIN" capture commit >/dev/null 2>&1 &
 fi
 {HOOK_MARKER_END}"""
 
 _POST_MERGE_BLOCK = f"""{HOOK_MARKER_START}
-AMGUARD_BIN="${{AMGUARD_BIN:-__AMGUARD_ENTRY__}}"
-if command -v "$AMGUARD_BIN" >/dev/null 2>&1; then
-  "$AMGUARD_BIN" capture merge >/dev/null 2>&1 &
+POLLUX_BIN="${{POLLUX_BIN:-__POLLUX_ENTRY__}}"
+if command -v "$POLLUX_BIN" >/dev/null 2>&1; then
+  "$POLLUX_BIN" capture merge >/dev/null 2>&1 &
 fi
 {HOOK_MARKER_END}"""
 
 
-def amguard_entry_path() -> str:
-    """Absolute POSIX-style path to the amguard CLI beside this interpreter.
+def pollux_entry_path() -> str:
+    """Absolute POSIX-style path to the pollux CLI beside this interpreter.
 
     Baked into installed hooks so they cannot silently switch to a different
     install via PATH (the same reasoning as the PJM_BIN pinning upstream of
     this project's governance work).
     """
     scripts_dir = Path(sys.executable).parent
-    for name in ("amguard.exe", "amguard"):
+    for name in ("pollux.exe", "pollux"):
         candidate = scripts_dir / name
         if candidate.exists():
             return candidate.resolve().as_posix()
-    return "amguard"  # PATH fallback; doctor flags this as drift-prone
+    return "pollux"  # PATH fallback; doctor flags this as drift-prone
 
 
 def _hook_path(repo_root: Path, name: str) -> Path:
@@ -72,7 +72,7 @@ def install_hooks(repo_root: Path) -> list[str]:
     names written. Idempotent: only the marked block is replaced."""
     git_hooks_dir = repo_root / ".git" / "hooks"
     git_hooks_dir.mkdir(parents=True, exist_ok=True)
-    entry = amguard_entry_path()
+    entry = pollux_entry_path()
     written: list[str] = []
     blocks = {
         "pre-commit": _PRE_COMMIT_BLOCK,
@@ -87,15 +87,15 @@ def install_hooks(repo_root: Path) -> list[str]:
                 os.chmod(path, 0o755)
         content = path.read_text(encoding="utf-8")
         if _is_legacy_projectmem_block(content):
-            raise GuardrailsFileError(
+            raise PolluxFileError(
                 f"{path} still contains a legacy projectmem hook block; "
-                f"remove it (pjm hooks uninstall) before installing amguard's."
+                f"remove it (pjm hooks uninstall) before installing pollux's."
             )
         set_marked_block(
             path,
             HOOK_MARKER_START,
             HOOK_MARKER_END,
-            block.replace("__AMGUARD_ENTRY__", entry),
+            block.replace("__POLLUX_ENTRY__", entry),
             heading=_BASH_HEADER,
         )
         written.append(name)

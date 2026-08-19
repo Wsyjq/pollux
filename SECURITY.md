@@ -12,7 +12,7 @@ local and provide only a redacted reproduction.
 
 ## Security boundaries
 
-- `amguard` executes the selected Python interpreter and projectmem module locally.
+- `pollux` executes the selected Python interpreter and projectmem module locally.
 - It does not upload source code or memory.
 - It writes only the selected project/memory roots and uses atomic replacement for managed text.
 - It does not merge global AI-client configuration automatically.

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from support import fixed_event, init_memory, write_events
 
-from agent_memory_guardrails.engine.summary import (
+from pollux.engine.summary import (
     build_summary,
     regenerate_summary,
     slugify,

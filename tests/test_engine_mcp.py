@@ -22,7 +22,7 @@ class McpServerTests(unittest.TestCase):
             async def scenario() -> dict:
                 params = StdioServerParameters(
                     command=sys.executable,
-                    args=["-m", "agent_memory_guardrails.engine.mcp_server",
+                    args=["-m", "pollux.engine.mcp_server",
                           "--root", str(mem.parent)],
                 )
                 async with (
@@ -72,7 +72,7 @@ class McpServerTests(unittest.TestCase):
             self.assertIn("MCP测试", result["search"])
 
             # The events really landed in the memory.
-            from agent_memory_guardrails.engine.storage import read_events
+            from pollux.engine.storage import read_events
 
             events = read_events(mem)
             self.assertEqual([e.type for e in events], ["note", "issue", "attempt", "fix"])

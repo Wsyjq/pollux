@@ -9,11 +9,11 @@ from pathlib import Path
 
 from support import init_memory, write_events
 
-from agent_memory_guardrails.engine.context import generate_context
-from agent_memory_guardrails.engine.index import MemoryIndex
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.precheck import precheck_files
-from agent_memory_guardrails.engine.search import search_events
+from pollux.engine.context import generate_context
+from pollux.engine.index import MemoryIndex
+from pollux.engine.models import Event
+from pollux.engine.precheck import precheck_files
+from pollux.engine.search import search_events
 
 
 def _ts(days_ago: float = 0.0) -> str:

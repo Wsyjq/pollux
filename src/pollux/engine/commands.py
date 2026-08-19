@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.locking import DirLock
-from agent_memory_guardrails.engine.models import Event, resolve_event_ref
-from agent_memory_guardrails.engine.storage import (
+from pollux.engine.errors import EngineError
+from pollux.engine.locking import DirLock
+from pollux.engine.models import Event, resolve_event_ref
+from pollux.engine.storage import (
     append_event,
     clear_current_issue,
     discover_mem_dir,
@@ -25,7 +25,7 @@ from agent_memory_guardrails.engine.storage import (
     require_mem_dir,
     write_current_issue,
 )
-from agent_memory_guardrails.engine.summary import regenerate_summary
+from pollux.engine.summary import regenerate_summary
 
 
 class Memory:
@@ -40,7 +40,7 @@ class Memory:
         if found is None:
             raise EngineError(
                 f"No .projectmem directory found in {(start or Path.cwd()).resolve()} "
-                f"or any parent. Run amguard init first."
+                f"or any parent. Run pollux init first."
             )
         return cls(found)
 
@@ -102,7 +102,7 @@ class Memory:
             if attached is None:
                 if not auto_issue:
                     raise EngineError(
-                        "No active issue. Pass --issue, run amguard log first, or use "
+                        "No active issue. Pass --issue, run pollux log first, or use "
                         "--auto-issue to open a parent issue from this attempt."
                     )
                 attached = next_issue_id(events)
@@ -141,7 +141,7 @@ class Memory:
             attached = issue_id or read_current_issue(self.mem_dir)
             if attached is None:
                 raise EngineError(
-                    "No active issue to fix. Pass --issue or run amguard log first."
+                    "No active issue to fix. Pass --issue or run pollux log first."
                 )
             if not any(event.issue_id == attached for event in events):
                 raise EngineError(f"Issue #{attached} does not exist in this memory.")

@@ -47,7 +47,7 @@ These upstream `projectmem` 0.2.x limitations no longer apply:
   conventions (修复/新增/重构/回滚/不兼容/文档/测试) are first-class.
 - `pjm search` did not search `git_commit` — it is a matched field now.
 - Generated instructions contained contradictory `PROJECT_MAP.md` wording —
-  amguard's `AI_INSTRUCTIONS.md` states the direct-maintenance rule plainly.
+  pollux's `AI_INSTRUCTIONS.md` states the direct-maintenance rule plainly.
 - No archival, no cross-process locking, per-event full rewrites — replaced
   by the archive lifecycle, the directory write lock, and incremental
   regeneration respectively.

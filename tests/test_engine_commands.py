@@ -8,9 +8,9 @@ from pathlib import Path
 
 from support import init_memory
 
-from agent_memory_guardrails.engine.commands import Memory
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.storage import read_current_issue, read_events
+from pollux.engine.commands import Memory
+from pollux.engine.errors import EngineError
+from pollux.engine.storage import read_current_issue, read_events
 
 
 class _MemoryCase(unittest.TestCase):

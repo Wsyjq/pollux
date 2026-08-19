@@ -12,10 +12,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from agent_memory_guardrails.engine.gitmeta import churn_since, file_histories_since
-from agent_memory_guardrails.engine.index import MemoryIndex
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.storage import read_events_lenient
+from pollux.engine.gitmeta import churn_since, file_histories_since
+from pollux.engine.index import MemoryIndex
+from pollux.engine.models import Event
+from pollux.engine.storage import read_events_lenient
 
 STALE_COMMIT_THRESHOLD = 3
 STALE_CHECKED_TYPES = ("decision", "fix", "note")

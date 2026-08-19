@@ -1,9 +1,13 @@
-# Agent Memory Guardrails
+# Pollux
 
 A complete, local-first project memory for AI coding agents: self-owned engine,
 governance, diagnostics, and per-file dossiers in one package.
 
 > **Status:** early alpha. The repository is not published to PyPI yet.
+> **The name:** Pollux is the immortal twin of Castor in Gemini. Here
+> `events.jsonl` is Castor — the mortal, append-only record that eventually
+> archives away — while the distilled `summary.md` is Pollux, the memory that
+> stays alive; one cannot exist without the other.
 > **Relationship to projectmem:** the on-disk format (`.projectmem/` layout,
 > six typed events, derived `summary.md`) is compatible with
 > [projectmem](https://github.com/riponcm/projectmem) 0.2.x so existing memories
@@ -31,24 +35,24 @@ more than storage:
 
 ## Features
 
-- `amguard init`: idempotent memory bootstrap with conservative defaults.
-- `amguard doctor`: structured configuration, privacy, hook, and secret audit.
-- `amguard render`: client-specific MCP configuration for five AI clients.
+- `pollux init`: idempotent memory bootstrap with conservative defaults.
+- `pollux doctor`: structured configuration, privacy, hook, and secret audit.
+- `pollux render`: client-specific MCP configuration for five AI clients.
 - Memory commands with upstream-compatible semantics: `log`, `attempt`, `fix`,
   `decision`, `note`, `show`, `search`, `precheck`, `context`, `regenerate`.
-- `amguard archive`: reversible lifecycle for closed, old issues and (opt-in)
+- `pollux archive`: reversible lifecycle for closed, old issues and (opt-in)
   old decisions, dry-run first.
-- `amguard backup`: verified whole-memory snapshots — the irreplaceable event
+- `pollux backup`: verified whole-memory snapshots — the irreplaceable event
   log lives outside git, so it needs its own safety net.
 - Budgeted MCP reads: `get_summary` returns a bounded digest when the full
   file would exceed the client's size budget (older entries used to be
   silently truncated away); `search_events` ranks by relevance.
-- `amguard capture`: bilingual (English + zh-CN) commit/merge classification,
+- `pollux capture`: bilingual (English + zh-CN) commit/merge classification,
   anchored by walk-up discovery, deduplicated by commit hash.
-- `amguard hooks`: managed, runtime-pinned, advisory git hooks.
-- `amguard dossier`: repository-agnostic per-file engineering dossiers
+- `pollux hooks`: managed, runtime-pinned, advisory git hooks.
+- `pollux dossier`: repository-agnostic per-file engineering dossiers
   (responsibility cards + memory + Git evidence).
-- `amguard mcp`: the fifteen-tool MCP server (same tool names as the historical
+- `pollux mcp`: the fifteen-tool MCP server (same tool names as the historical
   surface, so existing agent workflows keep working).
 - Team, private, and project-family profiles; atomic marked-block updates that
   preserve existing `AGENTS.md` and `CLAUDE.md` content.
@@ -63,7 +67,7 @@ Until the first public release, install from a local checkout:
 python -m pip install -e .
 ```
 
-The package exposes the `amguard` (CLI) and `amguard-mcp` (server) commands.
+The package exposes the `pollux` (CLI) and `pollux-mcp` (server) commands.
 
 ## Quick start
 
@@ -73,8 +77,8 @@ The distilled map, plan, summary, issues, and instructions may be committed. Raw
 runtime files are ignored.
 
 ```bash
-amguard init /path/to/repo --profile team --client opencode
-amguard doctor /path/to/repo
+pollux init /path/to/repo --profile team --client opencode
+pollux doctor /path/to/repo
 ```
 
 ### Private profile
@@ -82,7 +86,7 @@ amguard doctor /path/to/repo
 The complete `.projectmem/` directory is ignored.
 
 ```bash
-amguard init /path/to/repo --profile private --client claude
+pollux init /path/to/repo --profile private --client claude
 ```
 
 ### Project-family profile
@@ -91,20 +95,20 @@ Use only for tightly related repositories that intentionally share one project m
 history. The memory root must be an ancestor of the project.
 
 ```bash
-amguard init /workspace/repo-a \
+pollux init /workspace/repo-a \
   --profile family \
   --memory-root /workspace \
   --client codex
 ```
 
-Hooks in family mode are supported: `amguard`'s own hooks resolve the memory
+Hooks in family mode are supported: `pollux`'s own hooks resolve the memory
 by walking up from the Git root, so `--enable-hooks` works with a parent
 memory root.
 
 ## Conservative defaults
 
-`amguard init` keeps automation opt-in: Git hooks require `--enable-hooks`
-(and `amguard hooks install`). Global-memory auto-promotion stays off; the
+`pollux init` keeps automation opt-in: Git hooks require `--enable-hooks`
+(and `pollux hooks install`). Global-memory auto-promotion stays off; the
 global gotcha store is read-only by default.
 
 This sequence is intentional: establish an accurate project map and verify active MCP writes
@@ -113,23 +117,23 @@ before adding automation.
 ## Commands
 
 ```text
-amguard init [PATH] [--profile team|private|family] [--enable-hooks]
-amguard doctor [PATH] [--profile auto|team|private|family] [--json]
-amguard render opencode|zcode|claude|cursor|codex [PATH]
-amguard log|attempt|fix|decision|note <text> [--at loc] [--root DIR]
-amguard show|regenerate [--root DIR]
-amguard search <query> [--regex] [--failed-only] [--all]
-amguard precheck [files...] [--level info|warn|block] [--json]
-amguard context [--tokens N] [--focus AREA]
-amguard archive --before DATE [--decisions-before DATE] [--dry-run] [--status] [--restore]
-amguard backup [--to DIR] [--verify ZIP]
-amguard capture commit|merge [--repo-root DIR]
-amguard hooks install|uninstall [--repo DIR]
-amguard dossier <path> [--validate] [--emit-schema]
-amguard mcp
+pollux init [PATH] [--profile team|private|family] [--enable-hooks]
+pollux doctor [PATH] [--profile auto|team|private|family] [--json]
+pollux render opencode|zcode|claude|cursor|codex [PATH]
+pollux log|attempt|fix|decision|note <text> [--at loc] [--root DIR]
+pollux show|regenerate [--root DIR]
+pollux search <query> [--regex] [--failed-only] [--all]
+pollux precheck [files...] [--level info|warn|block] [--json]
+pollux context [--tokens N] [--focus AREA]
+pollux archive --before DATE [--decisions-before DATE] [--dry-run] [--status] [--restore]
+pollux backup [--to DIR] [--verify ZIP]
+pollux capture commit|merge [--repo-root DIR]
+pollux hooks install|uninstall [--repo DIR]
+pollux dossier <path> [--validate] [--emit-schema]
+pollux mcp
 ```
 
-Use `amguard <command> --help` for all options.
+Use `pollux <command> --help` for all options.
 
 ## What doctor checks
 
@@ -139,7 +143,7 @@ Use `amguard <command> --help` for all options.
 - Runtime and raw-event `.gitignore` policy.
 - Whether raw `events.jsonl` is tracked by Git.
 - Both project and shared-memory roots when using the family profile.
-- Legacy projectmem hook blocks (migration hint) and amguard hook runtime drift.
+- Legacy projectmem hook blocks (migration hint) and pollux hook runtime drift.
 - Windows hook paths and unresolved runtime pins.
 - OpenCode MCP root mismatch when `opencode.json` exists.
 - Common credential patterns without printing the matched value.
@@ -150,10 +154,10 @@ Use `amguard <command> --help` for all options.
 
 | Data | Owner | Direct editing |
 |---|---|---:|
-| `.projectmem/events.jsonl` | amguard engine append operations | No |
-| `.projectmem/summary.md` | amguard engine regeneration | No |
-| `.projectmem/issues/*.md` | amguard engine regeneration | No |
-| `.projectmem/archive/` | `amguard archive` (reversible) | No |
+| `.projectmem/events.jsonl` | pollux engine append operations | No |
+| `.projectmem/summary.md` | pollux engine regeneration | No |
+| `.projectmem/issues/*.md` | pollux engine regeneration | No |
+| `.projectmem/archive/` | `pollux archive` (reversible) | No |
 | `.projectmem/PROJECT_MAP.md` | Contributors and Agents | Yes |
 | `.projectmem/plan.md` | Contributors and Agents | Yes |
 
@@ -178,5 +182,5 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md), [architecture](./docs/architecture.md)
 
 ## License
 
-Agent Memory Guardrails is released under the [MIT License](./LICENSE). Dependency attribution is
+Pollux is released under the [MIT License](./LICENSE). Dependency attribution is
 listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

@@ -10,17 +10,17 @@ from pathlib import Path
 
 from support import init_memory, write_events
 
-from agent_memory_guardrails.engine.archive import (
+from pollux.engine.archive import (
     archive_files,
     read_archived_events,
     run_archive,
     run_restore,
 )
-from agent_memory_guardrails.engine.backup import run_backup, verify_backup
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.search import search_events
-from agent_memory_guardrails.engine.storage import read_events_lenient
-from agent_memory_guardrails.engine.summary import (
+from pollux.engine.backup import run_backup, verify_backup
+from pollux.engine.models import Event
+from pollux.engine.search import search_events
+from pollux.engine.storage import read_events_lenient
+from pollux.engine.summary import (
     build_summary,
     build_summary_digest,
     get_summary_view,
@@ -115,7 +115,7 @@ class DigestTests(unittest.TestCase):
         view = get_summary_view(self.mem)
         self.assertIn("summary digest", view)
         self.assertIn("仍然开放的中文问题", view)  # open issues are always visible
-        self.assertIn("`amguard show`", view)  # pointer to the full file
+        self.assertIn("`pollux show`", view)  # pointer to the full file
         self.assertLess(len(view), 12_000)
 
     def test_digest_bounds_every_section(self) -> None:

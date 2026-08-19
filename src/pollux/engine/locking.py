@@ -13,7 +13,7 @@ import os
 import time
 from pathlib import Path
 
-from agent_memory_guardrails.engine.errors import EngineError
+from pollux.engine.errors import EngineError
 
 
 class LockTimeout(EngineError):

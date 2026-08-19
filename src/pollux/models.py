@@ -78,7 +78,7 @@ class DoctorReport:
     def render_text(self) -> str:
         memory = str(self.memory_root) if self.memory_root else "not found"
         lines = [
-            "Agent Memory Guardrails doctor",
+            "Pollux doctor",
             f"Project: {self.project_root}",
             f"Memory:  {memory}",
             f"Profile: {self.profile}",

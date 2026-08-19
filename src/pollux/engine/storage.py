@@ -17,9 +17,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.redaction import redact_event_fields
+from pollux.engine.errors import EngineError
+from pollux.engine.models import Event
+from pollux.engine.redaction import redact_event_fields
 
 MEM_DIR = ".projectmem"
 SUMMARY_FILE = "summary.md"
@@ -69,7 +69,7 @@ def require_mem_dir(root: Path | None = None) -> Path:
         path = mem_path(root)
         if path.exists():
             return path
-        raise EngineError(f"No .projectmem directory found in {root}. Run amguard init.")
+        raise EngineError(f"No .projectmem directory found in {root}. Run pollux init.")
 
     env_root = os.environ.get("PROJECTMEM_ROOT")
     if env_root:
@@ -249,7 +249,7 @@ def append_event(event: Event, mem: Path) -> Event:
     if fired:
         kinds = ", ".join(sorted(set(fired)))
         print(
-            f"amguard: redacted {len(fired)} secret(s) before write ({kinds})",
+            f"pollux: redacted {len(fired)} secret(s) before write ({kinds})",
             file=sys.stderr,
         )
     path = events_path(mem)

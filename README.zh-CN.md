@@ -1,8 +1,11 @@
-# Agent Memory Guardrails
+# Pollux
 
 面向本地优先 AI 编程记忆的完整方案：自研引擎 + 治理规则 + 诊断 + 文件级档案，一个包。
 
 > **状态：**早期 Alpha，尚未发布到 PyPI。
+> **名字的由来：**Pollux（北河三）是双子座神话中的不朽双子，Castor 是凡人双子。
+> 在这里，`events.jsonl` 是 Castor——只增、终将归档的凡人记录；蒸馏出的
+> `summary.md` 是 Pollux——永生的记忆；两者互为一体，缺一不可。
 > **与 projectmem 的关系：**磁盘格式（`.projectmem/` 布局、六类事件、派生
 > `summary.md`）与 [projectmem](https://github.com/riponcm/projectmem) 0.2.x 兼容，
 > 存量记忆可无损沿用；但本项目不再依赖或包装它——引擎自研，根治其架构级限制
@@ -28,30 +31,30 @@
 python -m pip install -e .
 
 # 团队模式：可共享蒸馏文档，忽略原始事件与运行文件
-amguard init D:\path\to\repo --profile team --client opencode
+pollux init D:\path\to\repo --profile team --client opencode
 
 # 私有模式：忽略整个 .projectmem
-amguard init D:\path\to\repo --profile private --client claude
+pollux init D:\path\to\repo --profile private --client claude
 
 # 项目族模式：记忆锚定在父目录（hook 也支持）
-amguard init D:\work\repo-a --profile family --memory-root D:\work --client codex
+pollux init D:\work\repo-a --profile family --memory-root D:\work --client codex
 
 # 审计
-amguard doctor D:\path\to\repo
-amguard doctor D:\path\to\repo --json
+pollux doctor D:\path\to\repo
+pollux doctor D:\path\to\repo --json
 ```
 
 ## 命令一览
 
 ```text
-amguard log|attempt|fix|decision|note <text> [--at loc]   # 记录（语义与上游一致）
-amguard show|regenerate|search|precheck|context           # 读取与维护
-amguard archive --before DATE [--decisions-before DATE] [--restore]  # 生命周期（可逆）
-amguard backup [--to DIR] [--verify ZIP]               # 全记忆快照（自校验）
-amguard capture commit|merge                              # 双语自动捕获
-amguard hooks install|uninstall                           # 自管 hook（运行时钉扎）
-amguard dossier <path> [--validate]                       # 通用文件档案
-amguard mcp                                               # 15 工具 MCP 服务器
+pollux log|attempt|fix|decision|note <text> [--at loc]   # 记录（语义与上游一致）
+pollux show|regenerate|search|precheck|context           # 读取与维护
+pollux archive --before DATE [--decisions-before DATE] [--restore]  # 生命周期（可逆）
+pollux backup [--to DIR] [--verify ZIP]               # 全记忆快照（自校验）
+pollux capture commit|merge                              # 双语自动捕获
+pollux hooks install|uninstall                           # 自管 hook（运行时钉扎）
+pollux dossier <path> [--validate]                       # 通用文件档案
+pollux mcp                                               # 15 工具 MCP 服务器
 ```
 
 ## 三种策略
@@ -62,11 +65,11 @@ amguard mcp                                               # 15 工具 MCP 服务
 | `private` | 当前仓库 | 个人试用或记忆包含内部调查细节 |
 | `family` | 祖先目录 | 同一产品下多个紧密关联仓库共享历史 |
 
-`family` 模式的 hook 由 amguard 自有 hook 支持：从 Git 根向上发现记忆，父目录锚定可用。
+`family` 模式的 hook 由 pollux 自有 hook 支持：从 Git 根向上发现记忆，父目录锚定可用。
 
 ## 默认安全边界
 
-`amguard init` 保持自动化可选：Git hook 需 `--enable-hooks`（或 `amguard hooks install`）；
+`pollux init` 保持自动化可选：Git hook 需 `--enable-hooks`（或 `pollux hooks install`）；
 全局经验库自动晋升默认关闭（只读）。
 
 ## doctor 检查项
@@ -77,7 +80,7 @@ amguard mcp                                               # 15 工具 MCP 服务
 - 原始事件和运行文件是否被 Git 忽略。
 - `events.jsonl` 是否被错误跟踪。
 - `family` 策略下项目根与共享记忆根是否都安全。
-- 遗留 projectmem hook 块（迁移提示）与 amguard hook 运行时漂移。
+- 遗留 projectmem hook 块（迁移提示）与 pollux hook 运行时漂移。
 - Windows hook 路径与无法解析的运行时钉扎。
 - OpenCode 配置中的 `--root` 是否指向真实记忆根。
 - 常见凭据模式；报告只显示类型和行号，不回显值。
@@ -85,7 +88,7 @@ amguard mcp                                               # 15 工具 MCP 服务
 ## 数据来源边界
 
 `events.jsonl`、`summary.md`、`issues/*.md`、`archive/` 由工具维护，不手工修改
-（`archive` 经 `amguard archive` 操作且可逆）。`PROJECT_MAP.md` 和 `plan.md`
+（`archive` 经 `pollux archive` 操作且可逆）。`PROJECT_MAP.md` 和 `plan.md`
 分别记录当前结构与当前意图，需要直接维护。
 
 ## 开发验证

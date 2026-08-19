@@ -1,4 +1,4 @@
-"""In-process memory bootstrap — what ``amguard init`` uses instead of
+"""In-process memory bootstrap — what ``pollux init`` uses instead of
 shelling out to an upstream engine.
 
 Creates the ``.projectmem/`` skeleton idempotently: never overwrites an
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from agent_memory_guardrails.engine.storage import (
+from pollux.engine.storage import (
     AI_INSTRUCTIONS_FILE,
     CONFIG_FILE,
     EVENTS_FILE,
@@ -20,8 +20,8 @@ from agent_memory_guardrails.engine.storage import (
     PLAN_FILE,
     PROJECT_MAP_FILE,
 )
-from agent_memory_guardrails.engine.summary import regenerate_summary
-from agent_memory_guardrails.files import write_text_atomic
+from pollux.engine.summary import regenerate_summary
+from pollux.files import write_text_atomic
 
 CONFIG_DEFAULTS = (
     "summary_size_limit_kb = 20\n"
@@ -60,7 +60,7 @@ INITIAL_PLAN = (
 )
 
 AI_INSTRUCTIONS = """\
-# amguard AI Instructions
+# pollux AI Instructions
 
 These instructions are MANDATORY for all AI coding agents working in this
 project. Failure to follow them means your work is incomplete and the audit
@@ -81,7 +81,7 @@ trail is corrupted.
 
 **Step 2 — Read the four context files** via MCP tools
 (`get_instructions`, `get_summary`, `get_project_map`, `get_plan`) or the
-CLI (`amguard show`, `amguard context`).
+CLI (`pollux show`, `pollux context`).
 
 **Step 3 — Check `.projectmem/issues/` only when relevant** via
 `get_issue(id)`.
@@ -89,19 +89,19 @@ CLI (`amguard show`, `amguard context`).
 ## Working on a file
 
 1. Locate it in `PROJECT_MAP.md`; call `precheck_file(path)` (MCP) or
-   `amguard precheck <path>` (CLI) BEFORE proposing any change.
+   `pollux precheck <path>` (CLI) BEFORE proposing any change.
 2. Then read ONLY that file — not the whole codebase.
 
 ## MANDATORY triggers
 
 | Trigger | MCP tool | CLI |
 | --- | --- | --- |
-| Bug/unexpected behavior | `log_issue` | `amguard log "<text>" --at "<file:line>"` |
-| Attempt FAILED / PARTIAL / WORKED | `record_attempt` | `amguard attempt "<text>"` |
+| Bug/unexpected behavior | `log_issue` | `pollux log "<text>" --at "<file:line>"` |
+| Attempt FAILED / PARTIAL / WORKED | `record_attempt` | `pollux attempt "<text>"` |
   (add `--failed` / `--partial` / `--worked`) |
-| Fix confirmed with evidence | `record_fix` | `amguard fix "<text>"` |
-| Architectural decision | `add_decision` | `amguard decision "<text>"` |
-| Gotcha / setup detail | `add_note` | `amguard note "<text>"` |
+| Fix confirmed with evidence | `record_fix` | `pollux fix "<text>"` |
+| Architectural decision | `add_decision` | `pollux decision "<text>"` |
+| Gotcha / setup detail | `add_note` | `pollux note "<text>"` |
 
 - **Log BEFORE you fix.** Record each distinct attempt immediately; never
   batch attempts into one entry.
@@ -114,16 +114,16 @@ CLI (`amguard show`, `amguard context`).
 ## Data ownership
 
 - NEVER hand-edit `events.jsonl`, `summary.md`, or `issues/*.md` — they are
-  derived/append-only; use the tools above (or `amguard regenerate` to
+  derived/append-only; use the tools above (or `pollux regenerate` to
   rebuild derived files from the log).
 - `PROJECT_MAP.md` and `plan.md` are edited DIRECTLY by contributors.
 - Old closed issues may be moved to `.projectmem/archive/` via
-  `amguard archive`; every archive is reversible (`--restore`) and
+  `pollux archive`; every archive is reversible (`--restore`) and
   recorded in the archive manifest.
 
 ## Git hooks
 
-Hooks installed by `amguard hooks install` are advisory automation: commits
+Hooks installed by `pollux hooks install` are advisory automation: commits
 with recognizable subjects (English conventional prefixes or zh-CN
 conventions like 修复/新增/重构/回滚) are auto-captured, and merges are
 always captured. Verify a capture with `search_events("<hash>")` — search

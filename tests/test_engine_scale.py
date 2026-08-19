@@ -13,9 +13,9 @@ from pathlib import Path
 
 from support import init_memory, write_events
 
-from agent_memory_guardrails.engine.commands import Memory
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.summary import regenerate_summary
+from pollux.engine.commands import Memory
+from pollux.engine.models import Event
+from pollux.engine.summary import regenerate_summary
 
 
 def _scale_corpus() -> list[Event]:
@@ -102,7 +102,7 @@ class ScaleTests(unittest.TestCase):
 
 
 def read_lenient(mem: Path) -> list[Event]:
-    from agent_memory_guardrails.engine.storage import read_events
+    from pollux.engine.storage import read_events
 
     return read_events(mem)
 

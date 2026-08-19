@@ -18,11 +18,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from agent_memory_guardrails.engine.commands import Memory
-from agent_memory_guardrails.engine.gitmeta import _run_git, head_commit
-from agent_memory_guardrails.engine.index import MemoryIndex
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.storage import read_events_lenient
+from pollux.engine.commands import Memory
+from pollux.engine.gitmeta import _run_git, head_commit
+from pollux.engine.index import MemoryIndex
+from pollux.engine.models import Event
+from pollux.engine.storage import read_events_lenient
 
 CONFIDENCE_RANK = {"high": 3, "medium": 2, "low": 1}
 MIN_CONFIDENCE = "medium"
@@ -182,10 +182,10 @@ def capture_commit(repo_root: Path) -> Event | None:
         command="auto-capture",
     )
     with memory.write_lock():
-        from agent_memory_guardrails.engine.storage import append_event
+        from pollux.engine.storage import append_event
 
         append_event(event, mem)
-        from agent_memory_guardrails.engine.summary import regenerate_summary
+        from pollux.engine.summary import regenerate_summary
 
         regenerate_summary(mem)
     return event
@@ -215,17 +215,17 @@ def capture_merge(repo_root: Path) -> Event | None:
         command="auto-capture",
     )
     with memory.write_lock():
-        from agent_memory_guardrails.engine.storage import append_event
+        from pollux.engine.storage import append_event
 
         append_event(event, mem)
-        from agent_memory_guardrails.engine.summary import regenerate_summary
+        from pollux.engine.summary import regenerate_summary
 
         regenerate_summary(mem)
     return event
 
 
 def _discover_memory(repo_root: Path) -> Path | None:
-    from agent_memory_guardrails.engine.storage import discover_mem_dir
+    from pollux.engine.storage import discover_mem_dir
 
     return discover_mem_dir(repo_root)
 

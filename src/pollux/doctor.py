@@ -6,27 +6,27 @@ import re
 import subprocess
 from pathlib import Path
 
-from agent_memory_guardrails.constants import (
+from pollux.constants import (
     AGENT_MARKER_END,
     AGENT_MARKER_START,
     EXPECTED_MEMORY_FILES,
     RUNTIME_IGNORE_ENTRIES,
     VERSION,
 )
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.hooks import HOOK_MARKER_END, HOOK_MARKER_START
-from agent_memory_guardrails.files import (
-    GuardrailsFileError,
+from pollux.engine.errors import EngineError
+from pollux.engine.hooks import HOOK_MARKER_END, HOOK_MARKER_START
+from pollux.files import (
+    PolluxFileError,
     has_exact_line,
     managed_hook_block,
     read_text,
 )
-from agent_memory_guardrails.models import DoctorReport, Severity
-from agent_memory_guardrails.runtime import (
+from pollux.models import DoctorReport, Severity
+from pollux.runtime import (
     discover_memory_root,
     validate_roots,
 )
-from agent_memory_guardrails.secrets import memory_files, scan_files
+from pollux.secrets import memory_files, scan_files
 
 LEGACY_HOOK_MARKER_START = "# >>> projectmem auto-capture >>>"
 
@@ -67,8 +67,8 @@ def _check_agent_rules(report: DoctorReport) -> None:
             report.add(
                 "agent-rules-missing",
                 Severity.ERROR,
-                "AGENTS.md does not contain the guardrails workflow block.",
-                hint="Run `amguard init` to install the workflow block.",
+                "AGENTS.md does not contain the pollux workflow block.",
+                hint="Run `pollux init` to install the workflow block.",
                 path=path,
             )
             continue
@@ -78,8 +78,8 @@ def _check_agent_rules(report: DoctorReport) -> None:
             report.add(
                 "agent-rules-incomplete",
                 Severity.ERROR,
-                f"The guardrails block is missing: {', '.join(missing)}.",
-                hint="Re-run `amguard init` to refresh the marked block.",
+                f"The pollux block is missing: {', '.join(missing)}.",
+                hint="Re-run `pollux init` to refresh the marked block.",
                 path=path,
             )
 
@@ -95,7 +95,7 @@ def _check_gitignore(report: DoctorReport) -> None:
                 "private-ignore-missing",
                 Severity.ERROR,
                 "Private profile does not ignore the full .projectmem directory.",
-                hint="Run `amguard init --profile private`.",
+                hint="Run `pollux init --profile private`.",
                 path=path,
             )
         return
@@ -105,7 +105,7 @@ def _check_gitignore(report: DoctorReport) -> None:
                 "runtime-ignore-missing",
                 Severity.WARNING,
                 f"Runtime memory file is not explicitly ignored: {entry}",
-                hint="Run `amguard init` to add non-destructive ignore entries.",
+                hint="Run `pollux init` to add non-destructive ignore entries.",
                 path=path,
             )
 
@@ -114,9 +114,9 @@ def _check_hooks(report: DoctorReport, python: Path) -> None:
     hooks = report.project_root / ".git" / "hooks"
     if not hooks.is_dir():
         return
-    from agent_memory_guardrails.engine.hooks import amguard_entry_path
+    from pollux.engine.hooks import pollux_entry_path
 
-    expected = Path(amguard_entry_path())
+    expected = Path(pollux_entry_path())
     installed = []
     for name in ("pre-commit", "post-commit", "post-merge"):
         path = hooks / name
@@ -126,30 +126,30 @@ def _check_hooks(report: DoctorReport, python: Path) -> None:
                 "hook-legacy-projectmem",
                 Severity.WARNING,
                 f"{name} still contains a legacy projectmem hook block.",
-                hint="Remove it with `pjm hooks uninstall`, then `amguard hooks install`.",
+                hint="Remove it with `pjm hooks uninstall`, then `pollux hooks install`.",
                 path=path,
             )
         try:
             block = managed_hook_block(content, HOOK_MARKER_START, HOOK_MARKER_END)
-        except GuardrailsFileError as exc:
+        except PolluxFileError as exc:
             report.add(
                 "hook-block-invalid",
                 Severity.ERROR,
-                f"{name} has invalid amguard markers: {exc}",
-                hint="Repair the marker pair, then re-run `amguard hooks install`.",
+                f"{name} has invalid pollux markers: {exc}",
+                hint="Repair the marker pair, then re-run `pollux hooks install`.",
                 path=path,
             )
             continue
         if block is None:
             continue
         installed.append(name)
-        match = re.search(r'AMGUARD_BIN="\$\{AMGUARD_BIN:-(.+)\}"', block)
+        match = re.search(r'POLLUX_BIN="\$\{POLLUX_BIN:-(.+)\}"', block)
         if match is None:
             report.add(
                 "hook-runtime-unpinned",
                 Severity.WARNING,
-                f"{name} does not pin the amguard runtime in the managed block.",
-                hint="Re-run `amguard hooks install` after repairing the hook block.",
+                f"{name} does not pin the pollux runtime in the managed block.",
+                hint="Re-run `pollux hooks install` after repairing the hook block.",
                 path=path,
             )
             continue
@@ -159,7 +159,7 @@ def _check_hooks(report: DoctorReport, python: Path) -> None:
                 "windows-hook-path",
                 Severity.WARNING,
                 f"{name} uses a backslash runtime path that Git Bash may reject.",
-                hint="Re-run `amguard hooks install` to normalize it.",
+                hint="Re-run `pollux hooks install` to normalize it.",
                 path=path,
             )
         actual_path = pinned.replace("\\", "/").rstrip("/")
@@ -171,16 +171,16 @@ def _check_hooks(report: DoctorReport, python: Path) -> None:
             report.add(
                 "hook-runtime-mismatch",
                 Severity.WARNING,
-                f"{name} pins an amguard runtime outside the selected environment.",
-                hint="Re-run `amguard hooks install` to pin the selected runtime.",
+                f"{name} pins a pollux runtime outside the selected environment.",
+                hint="Re-run `pollux hooks install` to pin the selected runtime.",
                 path=path,
             )
         elif not expected.is_file():
             report.add(
                 "hook-runtime-unresolved",
                 Severity.WARNING,
-                "The pinned amguard CLI does not exist beside the selected runtime.",
-                hint="Install agent-memory-guardrails in that environment and re-run install.",
+                "The pinned pollux CLI does not exist beside the selected runtime.",
+                hint="Install pollux in that environment and re-run install.",
                 path=hooks,
             )
 
@@ -191,13 +191,13 @@ def _check_opencode(report: DoctorReport) -> None:
         return
     try:
         data = json.loads(read_text(path))
-        command = data["mcp"]["amguard"]["command"]
+        command = data["mcp"]["pollux"]["command"]
     except (json.JSONDecodeError, KeyError, TypeError):
         report.add(
             "opencode-config-invalid",
             Severity.ERROR,
-            "opencode.json has no readable mcp.amguard command.",
-            hint="Use `amguard render opencode` and merge only the amguard entry.",
+            "opencode.json has no readable mcp.pollux command.",
+            hint="Use `pollux render opencode` and merge only the pollux entry.",
             path=path,
         )
         return
@@ -205,8 +205,8 @@ def _check_opencode(report: DoctorReport) -> None:
         report.add(
             "opencode-config-invalid",
             Severity.ERROR,
-            "opencode.json mcp.amguard.command must be a list of strings.",
-            hint="Use `amguard render opencode` and merge only the amguard entry.",
+            "opencode.json mcp.pollux.command must be a list of strings.",
+            hint="Use `pollux render opencode` and merge only the pollux entry.",
             path=path,
         )
         return
@@ -219,8 +219,8 @@ def _check_opencode(report: DoctorReport) -> None:
         report.add(
             "opencode-root-mismatch",
             Severity.ERROR,
-            "OpenCode amguard command does not target the discovered memory root.",
-            hint="Regenerate the client block with `amguard render opencode`.",
+            "OpenCode pollux command does not target the discovered memory root.",
+            hint="Regenerate the client block with `pollux render opencode`.",
             path=path,
         )
 
@@ -250,7 +250,7 @@ def run_doctor(
             "memory-root-missing",
             Severity.ERROR,
             "No initialized .projectmem directory was found.",
-            hint="Run `amguard init`.",
+            hint="Run `pollux init`.",
         )
         return report
 
@@ -273,14 +273,14 @@ def run_doctor(
                 "memory-file-missing",
                 Severity.ERROR,
                 f"Required memory file is missing: {name}",
-                hint="Re-run `amguard init` to complete the memory skeleton.",
+                hint="Re-run `pollux init` to complete the memory skeleton.",
                 path=path,
             )
 
     report.add(
-        "amguard-version",
+        "pollux-version",
         Severity.INFO,
-        f"amguard {VERSION} (own engine, on-disk format compatible with the "
+        f"pollux {VERSION} (own engine, on-disk format compatible with the "
         f"historical projectmem layout).",
     )
 

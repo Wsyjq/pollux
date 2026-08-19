@@ -1,7 +1,7 @@
 """End-to-end integration against the own engine (no upstream dependency).
 
 These used to drive the real third-party ``projectmem`` CLI; they now drive
-amguard's in-process bootstrap and the full write→regenerate→doctor cycle.
+pollux's in-process bootstrap and the full write→regenerate→doctor cycle.
 """
 from __future__ import annotations
 
@@ -15,9 +15,9 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
-from agent_memory_guardrails.cli import main
-from agent_memory_guardrails.doctor import run_doctor
-from agent_memory_guardrails.engine.hooks import amguard_entry_path
+from pollux.cli import main
+from pollux.doctor import run_doctor
+from pollux.engine.hooks import pollux_entry_path
 
 
 def file_hashes(root: Path, paths: tuple[Path, ...]) -> dict[str, str]:
@@ -50,14 +50,14 @@ class IntegrationTests(unittest.TestCase):
             first_output = self.run_init(
                 str(root), "--profile", "team", "--enable-hooks"
             )
-            pinned = amguard_entry_path()
+            pinned = pollux_entry_path()
             hooks = tuple(
                 root / ".git" / "hooks" / name
                 for name in ("pre-commit", "post-commit", "post-merge")
             )
             for hook in hooks:
                 content = hook.read_text("utf-8")
-                self.assertIn(f'AMGUARD_BIN="${{AMGUARD_BIN:-{pinned}}}"', content)
+                self.assertIn(f'POLLUX_BIN="${{POLLUX_BIN:-{pinned}}}"', content)
                 if os.name != "nt":
                     self.assertTrue(os.access(hook, os.X_OK), f"Hook is not executable: {hook}")
 

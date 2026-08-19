@@ -21,18 +21,18 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path
 
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.locking import DirLock
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.storage import (
+from pollux.engine.errors import EngineError
+from pollux.engine.locking import DirLock
+from pollux.engine.models import Event
+from pollux.engine.storage import (
     ARCHIVE_DIR,
     EVENTS_FILE,
     read_events,
     read_events_lenient,
     serialize_event,
 )
-from agent_memory_guardrails.engine.summary import group_issue_events, regenerate_summary
-from agent_memory_guardrails.files import write_text_atomic
+from pollux.engine.summary import group_issue_events, regenerate_summary
+from pollux.files import write_text_atomic
 
 
 def archive_dir(mem: Path) -> Path:

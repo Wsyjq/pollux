@@ -1,6 +1,6 @@
 # Engine cards
 
-## `agent-memory-guardrails/src/agent_memory_guardrails/engine/commands.py`
+## `pollux/src/pollux/engine/commands.py`
 
 - 状态：active
 - 等级：A
@@ -13,7 +13,7 @@
 - 权威文档：docs/architecture.md。
 - 核实：committed baseline。
 
-## `agent-memory-guardrails/src/agent_memory_guardrails/engine/summary.py`
+## `pollux/src/pollux/engine/summary.py`
 
 - 状态：active
 - 等级：A

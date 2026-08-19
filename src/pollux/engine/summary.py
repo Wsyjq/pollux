@@ -22,21 +22,21 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agent_memory_guardrails.engine.models import (
+from pollux.engine.models import (
     Event,
     slugify,
     superseded_ids,
 )
-from agent_memory_guardrails.engine.storage import (
+from pollux.engine.storage import (
     issues_dir as issues_dir_path,
 )
-from agent_memory_guardrails.engine.storage import (
+from pollux.engine.storage import (
     project_map_path,
     read_config,
     read_events,
     summary_path,
 )
-from agent_memory_guardrails.files import write_text_atomic
+from pollux.files import write_text_atomic
 
 # Placeholder phrases meaning "the purpose is still unset" — recognized in
 # both PROJECT_MAP.md and legacy summaries so a placeholder never round-trips
@@ -395,7 +395,7 @@ def build_summary_digest(
     Unlike the full summary this always bounds every section: open issues up
     front (capped with disclosure), a recent-closed sample, latest decisions
     and notes, plus explicit pointers to the tools that reach the rest. The
-    full file remains available via ``amguard show``.
+    full file remains available via ``pollux show``.
     """
     now = datetime.now(timezone.utc).date().isoformat()
     grouped = group_issue_events(events)
@@ -421,14 +421,14 @@ def build_summary_digest(
     notes = [event for event in events if event.type == "note"]
 
     lines = [
-        f"# amguard summary digest — {root_name}",
+        f"# pollux summary digest — {root_name}",
         "",
         f"_Last updated: {now}; events: {len(events)}, open issues: "
         f"{len(open_groups)}, closed: {len(closed_groups)}, decisions: "
         f"{len(decisions)}_",
         "",
         "_Digest (the full summary exceeds the MCP size budget). Complete file: "
-        "`amguard show`; one issue: `get_issue(id)`; anything: `search_events`._",
+        "`pollux show`; one issue: `get_issue(id)`; anything: `search_events`._",
         "",
         "## Project purpose",
         project_purpose or _DEFAULT_PURPOSE,
@@ -494,6 +494,6 @@ def get_summary_view(mem: Path) -> str:
 
 
 def _read_events_lenient_for_view(mem: Path) -> tuple[list[Event], list[int]]:
-    from agent_memory_guardrails.engine.storage import read_events_lenient
+    from pollux.engine.storage import read_events_lenient
 
     return read_events_lenient(mem)

@@ -1,7 +1,7 @@
 """Cross-process concurrency proof: two writers hammering one memory must
 produce a complete, valid, uniquely-numbered event log with no lock residue.
 
-Each writer process runs the real CLI entry (`python -m agent_memory_guardrails`)
+Each writer process runs the real CLI entry (`python -m pollux`)
 against the same project root, exactly like two worktrees would.
 """
 from __future__ import annotations
@@ -14,12 +14,12 @@ from pathlib import Path
 
 from support import init_memory
 
-from agent_memory_guardrails.engine.storage import read_events
+from pollux.engine.storage import read_events
 
 _WORKER = """
 import sys
 
-from agent_memory_guardrails.cli import main
+from pollux.cli import main
 
 root = sys.argv[1]
 worker = sys.argv[2]

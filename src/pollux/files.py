@@ -7,7 +7,7 @@ from collections.abc import Iterable
 from pathlib import Path
 
 
-class GuardrailsFileError(RuntimeError):
+class PolluxFileError(RuntimeError):
     pass
 
 
@@ -66,7 +66,7 @@ def set_marked_block(
     start_count = content.count(start_marker)
     end_count = content.count(end_marker)
     if start_count != end_count or start_count > 1:
-        raise GuardrailsFileError(
+        raise PolluxFileError(
             f"Expected zero or one complete marker pair in {path}; "
             f"found {start_count} start and {end_count} end markers."
         )
@@ -76,7 +76,7 @@ def set_marked_block(
         start = content.index(start_marker)
         raw_end = content.index(end_marker)
         if raw_end < start:
-            raise GuardrailsFileError(f"Marker order is invalid in {path}.")
+            raise PolluxFileError(f"Marker order is invalid in {path}.")
         end = raw_end + len(end_marker)
         updated = content[:start] + normalized_block + content[end:]
     else:
@@ -125,12 +125,12 @@ def managed_hook_block(content: str, start_marker: str, end_marker: str) -> str 
     if start_count == 0 and end_count == 0:
         return None
     if start_count != 1 or end_count != 1:
-        raise GuardrailsFileError(
+        raise PolluxFileError(
             "Expected one complete managed hook marker pair; "
             f"found {start_count} start and {end_count} end markers."
         )
     start = content.index(start_marker)
     raw_end = content.index(end_marker)
     if raw_end < start:
-        raise GuardrailsFileError("Managed hook marker order is invalid.")
+        raise PolluxFileError("Managed hook marker order is invalid.")
     return content[start : raw_end + len(end_marker)]

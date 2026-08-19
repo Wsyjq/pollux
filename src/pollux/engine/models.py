@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
-from agent_memory_guardrails.engine.errors import EngineError
+from pollux.engine.errors import EngineError
 
 VALID_EVENT_TYPES = {
     "issue",

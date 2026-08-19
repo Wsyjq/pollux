@@ -10,20 +10,22 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
-from agent_memory_guardrails.cli import (
+from pollux.cli import (
     _configure_stream,
     _write_agent_files,
     build_parser,
     main,
 )
-from agent_memory_guardrails.constants import (
+from pollux.constants import (
     AGENT_MARKER_END,
     AGENT_MARKER_START,
     CLAUDE_MARKER_START,
+    LEGACY_AGENT_MARKER2_END,
+    LEGACY_AGENT_MARKER2_START,
     LEGACY_AGENT_MARKER_END,
     LEGACY_AGENT_MARKER_START,
 )
-from agent_memory_guardrails.files import GuardrailsFileError
+from pollux.files import PolluxFileError
 
 
 class CliTests(unittest.TestCase):
@@ -32,7 +34,7 @@ class CliTests(unittest.TestCase):
             build_parser().parse_args(["init", "--no-agent-files"])
 
     def test_init_writes_agent_rules_before_engine_bootstrap(self) -> None:
-        from agent_memory_guardrails.engine.bootstrap import initialize_memory
+        from pollux.engine.bootstrap import initialize_memory
 
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -44,7 +46,7 @@ class CliTests(unittest.TestCase):
 
             with (
                 patch(
-                    "agent_memory_guardrails.cli.initialize_memory", side_effect=bootstrap
+                    "pollux.cli.initialize_memory", side_effect=bootstrap
                 ),
                 redirect_stdout(io.StringIO()),
             ):
@@ -141,8 +143,8 @@ class CliTests(unittest.TestCase):
                 code = main(["render", "opencode", str(root), "--python", sys.executable])
             self.assertEqual(code, 0)
             rendered = json.loads(output.getvalue())
-            self.assertEqual(rendered["mcp"]["amguard"]["command"][-1], str(root))
-            self.assertEqual(rendered["mcp"]["amguard"]["type"], "local")
+            self.assertEqual(rendered["mcp"]["pollux"]["command"][-1], str(root))
+            self.assertEqual(rendered["mcp"]["pollux"]["type"], "local")
 
     def test_agent_writer_migrates_legacy_marker_without_duplicates(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -173,7 +175,41 @@ class CliTests(unittest.TestCase):
             )
             path.write_text(original, encoding="utf-8")
 
-            with self.assertRaises(GuardrailsFileError):
+            with self.assertRaises(PolluxFileError):
+                _write_agent_files(root, root)
+
+            self.assertEqual(path.read_text(encoding="utf-8"), original)
+
+    def test_agent_writer_migrates_oldest_legacy_marker_without_duplicates(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / "AGENTS.md"
+            path.write_text(
+                "# AGENTS.md\n\n"
+                f"{LEGACY_AGENT_MARKER2_START}\nold rules\n{LEGACY_AGENT_MARKER2_END}\n",
+                encoding="utf-8",
+            )
+
+            _write_agent_files(root, root)
+            first = path.read_text(encoding="utf-8")
+            _write_agent_files(root, root)
+
+            self.assertNotIn(LEGACY_AGENT_MARKER2_START, first)
+            self.assertEqual(first.count(AGENT_MARKER_START), 1)
+            self.assertEqual(path.read_text(encoding="utf-8"), first)
+
+    def test_agent_writer_rejects_mixed_legacy_generations(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / "AGENTS.md"
+            original = (
+                "# AGENTS.md\n\n"
+                f"{LEGACY_AGENT_MARKER_START}\nnewer legacy\n{LEGACY_AGENT_MARKER_END}\n\n"
+                f"{LEGACY_AGENT_MARKER2_START}\nolder legacy\n{LEGACY_AGENT_MARKER2_END}\n"
+            )
+            path.write_text(original, encoding="utf-8")
+
+            with self.assertRaises(PolluxFileError):
                 _write_agent_files(root, root)
 
             self.assertEqual(path.read_text(encoding="utf-8"), original)

@@ -19,9 +19,10 @@ from typing import Annotated
 
 from pydantic import Field
 
-from agent_memory_guardrails.engine.commands import Memory
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.storage import (
+from pollux.constants import VERSION
+from pollux.engine.commands import Memory
+from pollux.engine.errors import EngineError
+from pollux.engine.storage import (
     discover_mem_dir,
     read_events_lenient,
 )
@@ -77,7 +78,7 @@ def safe_tool(fn: Callable) -> Callable:
             with _suppress_stdout():
                 return fn(*args, **kwargs)
         except Exception as exc:  # one tool failure must not kill the session
-            return f"amguard tool error: {type(exc).__name__}: {exc}"
+            return f"pollux tool error: {type(exc).__name__}: {exc}"
 
     return wrapper
 
@@ -89,7 +90,12 @@ except ImportError as exc:  # pragma: no cover - dependency guard
         "The 'mcp' package is required to run the server: pip install 'mcp>=1.2'"
     ) from exc
 
-mcp = FastMCP("amguard")
+mcp = FastMCP("pollux")
+# FastMCP (mcp 1.x) exposes no version parameter; stamp the lowlevel server so
+# the handshake reports the application version, not the SDK's.
+_inner = getattr(mcp, "_mcp_server", None)
+if _inner is not None:
+    _inner.version = VERSION
 
 
 @mcp.tool()
@@ -109,8 +115,8 @@ def get_summary() -> str:
     Small memories return the full file; when the summary exceeds the MCP
     size budget (where client-side truncation would silently hide older
     entries), a bounded digest is returned instead with pointers to
-    `get_issue`/`search_events`/`amguard show`."""
-    from agent_memory_guardrails.engine.summary import get_summary_view
+    `get_issue`/`search_events`/`pollux show`."""
+    from pollux.engine.summary import get_summary_view
 
     return get_summary_view(_mem())
 
@@ -146,7 +152,7 @@ def precheck_file(
 ) -> str:
     """Check a file's memory before modifying it: open issues, failed and
     partial attempts, stale decisions, churn. Read-only."""
-    from agent_memory_guardrails.engine.precheck import precheck_files
+    from pollux.engine.precheck import precheck_files
 
     report = precheck_files(_mem(), [file_path.replace("\\", "/")])
     return report.render_text()
@@ -186,7 +192,7 @@ def search_events(
     """Search the event log, most relevant first (open issues, unresolved
     failures, recency, and file-path hits rank higher). Empty result
     returns a friendly message, not an error. Read-only."""
-    from agent_memory_guardrails.engine.search import format_result, search_events
+    from pollux.engine.search import format_result, search_events
 
     events = search_events(
         _mem(), query, include_archived=include_archived, ranked=True
@@ -225,7 +231,7 @@ def get_score() -> str:
         else "C" if score >= 55 else "D" if score >= 40 else "F"
     )
     return (
-        f"amguard Prevention Score: {grade} ({score}/100)\n"
+        f"pollux Prevention Score: {grade} ({score}/100)\n"
         f"  Issues on record: {len(issue_ids)} ({len(fixed_ids)} fixed)\n"
         f"  Failed approaches on record: {failed}\n"
         f"  Decisions documented: {decisions}\n"
@@ -247,7 +253,7 @@ def get_context(
     """Token-budgeted context block biased toward failures and decisions.
 
     Read-only."""
-    from agent_memory_guardrails.engine.context import generate_context
+    from pollux.engine.context import generate_context
 
     return generate_context(
         _mem(), token_budget=tokens, focus=focus, recent_days=recent_days
@@ -265,7 +271,7 @@ def get_global_gotchas(
     """Read cross-project gotchas from the shared global store.
 
     Read-only. Auto-promotion into this store stays OFF by default in
-    amguard (conservative governance); entries come from explicit curation."""
+    pollux (conservative governance); entries come from explicit curation."""
     home = os.environ.get("PROJECTMEM_HOME")
     base = Path(home) if home else (Path.home() / ".projectmem")
     store = base / "global" / "gotchas.json"

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from support import init_memory, write_events
 
-from agent_memory_guardrails.engine.archive import (
+from pollux.engine.archive import (
     archive_files,
     archive_status,
     plan_archive,
@@ -16,10 +16,10 @@ from agent_memory_guardrails.engine.archive import (
     run_archive,
     run_restore,
 )
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.search import search_events
-from agent_memory_guardrails.engine.storage import serialize_event
+from pollux.engine.errors import EngineError
+from pollux.engine.models import Event
+from pollux.engine.search import search_events
+from pollux.engine.storage import serialize_event
 
 
 def _ts(days_ago: float) -> str:

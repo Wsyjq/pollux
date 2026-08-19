@@ -5,10 +5,14 @@ VERSION = "0.2.0a1"
 PROFILES = ("team", "private", "family")
 CLIENTS = ("opencode", "zcode", "claude", "cursor", "codex", "dsh")
 
-AGENT_MARKER_START = "<!-- >>> agent-memory-guardrails >>> -->"
-AGENT_MARKER_END = "<!-- <<< agent-memory-guardrails <<< -->"
-LEGACY_AGENT_MARKER_START = "<!-- >>> projectmem workflow >>> -->"
-LEGACY_AGENT_MARKER_END = "<!-- <<< projectmem workflow <<< -->"
+AGENT_MARKER_START = "<!-- >>> pollux >>> -->"
+AGENT_MARKER_END = "<!-- <<< pollux <<< -->"
+# Older governance-marker generations that init migrates in place. Seeing
+# markers from two generations in one file is an error, never auto-merged.
+LEGACY_AGENT_MARKER_START = "<!-- >>> agent-memory-guardrails >>> -->"
+LEGACY_AGENT_MARKER_END = "<!-- <<< agent-memory-guardrails <<< -->"
+LEGACY_AGENT_MARKER2_START = "<!-- >>> projectmem workflow >>> -->"
+LEGACY_AGENT_MARKER2_END = "<!-- <<< projectmem workflow <<< -->"
 CLAUDE_MARKER_START = "<!-- >>> projectmem bridge >>> -->"
 CLAUDE_MARKER_END = "<!-- <<< projectmem bridge <<< -->"
 
@@ -35,9 +39,9 @@ EXPECTED_MEMORY_FILES = (
 )
 
 AGENT_BLOCK = f"""{AGENT_MARKER_START}
-## Project Memory Guardrails (MANDATORY)
+## Pollux Project Memory (MANDATORY)
 
-This project uses amguard as its persistent engineering memory (own engine,
+This project uses pollux as its persistent engineering memory (own engine,
 on-disk format compatible with the historical projectmem layout).
 
 At session start, call these MCP tools in order:
@@ -70,7 +74,7 @@ subjects are auto-captured. Verify a capture with `search_events("<hash>")`
 CLAUDE_BLOCK = f"""{CLAUDE_MARKER_START}
 ## project memory (MANDATORY)
 
-Use amguard as this project's persistent engineering memory.
+Use pollux as this project's persistent engineering memory.
 
 At session start call `get_instructions()`, then `get_summary()`, then
 `get_project_map()` when structure matters, and `get_plan()` for current intent.

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from agent_memory_guardrails.engine.models import Event, superseded_ids
+from pollux.engine.models import Event, superseded_ids
 
 
 @dataclass

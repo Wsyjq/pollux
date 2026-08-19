@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "repositoryId": "agent-memory-guardrails",
+  "repositoryId": "pollux",
   "cards": [
     {
-      "path": "agent-memory-guardrails/src/agent_memory_guardrails/engine/commands.py",
+      "path": "pollux/src/pollux/engine/commands.py",
       "card": "docs/file-cards/engine.md",
       "tier": "A",
       "verifiedCommit": "63070b8d03226f9caa40641a40f5742b3fb3b9a2",
       "verifiedBlob": "16eb48fadd7df6dbabf5bbb98ebdc0a20df189b9"
     },
     {
-      "path": "agent-memory-guardrails/src/agent_memory_guardrails/engine/summary.py",
+      "path": "pollux/src/pollux/engine/summary.py",
       "card": "docs/file-cards/engine.md",
       "tier": "A",
       "verifiedCommit": "63070b8d03226f9caa40641a40f5742b3fb3b9a2",

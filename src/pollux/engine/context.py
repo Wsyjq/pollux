@@ -11,9 +11,9 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from agent_memory_guardrails.engine.gitmeta import status_files
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.storage import read_events_lenient
+from pollux.engine.gitmeta import status_files
+from pollux.engine.models import Event
+from pollux.engine.storage import read_events_lenient
 
 CHARS_PER_TOKEN = 4
 
@@ -127,7 +127,7 @@ def generate_context(
 
     char_budget = token_budget * CHARS_PER_TOKEN
     lines: list[str] = [
-        f"## amguard context (budget: {token_budget} tokens, focus: {focus or 'all'})"
+        f"## pollux context (budget: {token_budget} tokens, focus: {focus or 'all'})"
     ]
     chars_used = len(lines[0])
     included = 0

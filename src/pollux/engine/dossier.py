@@ -310,10 +310,10 @@ def engine_memory_loader(repo_root: Path, canonical: str) -> dict[str, str]:
     Replaces the original's ``pjm`` subprocess calls: same three sections
     (precheck / events / context), read directly from the engine.
     """
-    from agent_memory_guardrails.engine.context import generate_context
-    from agent_memory_guardrails.engine.precheck import precheck_files
-    from agent_memory_guardrails.engine.search import format_result, search_events
-    from agent_memory_guardrails.engine.storage import discover_mem_dir
+    from pollux.engine.context import generate_context
+    from pollux.engine.precheck import precheck_files
+    from pollux.engine.search import format_result, search_events
+    from pollux.engine.storage import discover_mem_dir
 
     mem = discover_mem_dir(repo_root)
     if mem is None:

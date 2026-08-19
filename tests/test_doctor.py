@@ -7,16 +7,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from agent_memory_guardrails.constants import (
+from pollux.constants import (
     AGENT_BLOCK,
     EXPECTED_MEMORY_FILES,
     RUNTIME_IGNORE_ENTRIES,
 )
-from agent_memory_guardrails.doctor import run_doctor
-from agent_memory_guardrails.engine.hooks import (
+from pollux.doctor import run_doctor
+from pollux.engine.hooks import (
     HOOK_MARKER_END,
     HOOK_MARKER_START,
-    amguard_entry_path,
+    pollux_entry_path,
 )
 
 
@@ -108,7 +108,7 @@ class DoctorTests(unittest.TestCase):
             hooks.mkdir(parents=True)
             (hooks / "pre-commit").write_text(
                 f"{HOOK_MARKER_START}\n"
-                'AMGUARD_BIN="${AMGUARD_BIN:-D:/global/amguard.exe}"\n'
+                'POLLUX_BIN="${POLLUX_BIN:-D:/global/pollux.exe}"\n'
                 f"{HOOK_MARKER_END}\n",
                 encoding="utf-8",
             )
@@ -123,10 +123,10 @@ class DoctorTests(unittest.TestCase):
             create_memory(root)
             hooks = root / ".git" / "hooks"
             hooks.mkdir(parents=True)
-            pinned = amguard_entry_path()
+            pinned = pollux_entry_path()
             (hooks / "post-commit").write_text(
                 f"{HOOK_MARKER_START}\n"
-                f'AMGUARD_BIN="${{AMGUARD_BIN:-{pinned}}}"\n'
+                f'POLLUX_BIN="${{POLLUX_BIN:-{pinned}}}"\n'
                 f"{HOOK_MARKER_END}\n",
                 encoding="utf-8",
             )
@@ -198,11 +198,11 @@ class DoctorTests(unittest.TestCase):
                 json.dumps(
                     {
                         "mcp": {
-                            "amguard": {
+                            "pollux": {
                                 "command": [
                                     "python",
                                     "-m",
-                                    "agent_memory_guardrails.engine.mcp_server",
+                                    "pollux.engine.mcp_server",
                                     "--root",
                                     "/wrong",
                                 ]
@@ -220,7 +220,7 @@ class DoctorTests(unittest.TestCase):
             root = Path(temp)
             create_memory(root)
             (root / "opencode.json").write_text(
-                json.dumps({"mcp": {"amguard": {"command": 123}}}),
+                json.dumps({"mcp": {"pollux": {"command": 123}}}),
                 encoding="utf-8",
             )
 

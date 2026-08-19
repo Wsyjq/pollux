@@ -10,10 +10,10 @@ from pathlib import Path
 
 from support import init_memory
 
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.locking import DirLock, LockTimeout
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.storage import (
+from pollux.engine.errors import EngineError
+from pollux.engine.locking import DirLock, LockTimeout
+from pollux.engine.models import Event
+from pollux.engine.storage import (
     append_event,
     clear_current_issue,
     current_issue_id,

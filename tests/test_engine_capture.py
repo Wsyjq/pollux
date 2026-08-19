@@ -10,17 +10,17 @@ from pathlib import Path
 
 from support import init_memory
 
-from agent_memory_guardrails.engine.capture import (
+from pollux.engine.capture import (
     capture_commit,
     capture_merge,
     classify_message,
 )
-from agent_memory_guardrails.engine.hooks import (
+from pollux.engine.hooks import (
     HOOK_MARKER_START,
     install_hooks,
     uninstall_hooks,
 )
-from agent_memory_guardrails.engine.storage import read_events_lenient
+from pollux.engine.storage import read_events_lenient
 
 
 class ClassifierTests(unittest.TestCase):

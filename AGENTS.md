@@ -1,7 +1,7 @@
 # AGENTS.md
 
-<!-- >>> agent-memory-guardrails >>> -->
-## Project Memory Guardrails (MANDATORY)
+<!-- >>> pollux >>> -->
+## Pollux Project Memory (MANDATORY)
 
 This project uses projectmem as its persistent engineering memory.
 
@@ -28,4 +28,4 @@ Source-of-truth boundary:
 
 Git hooks are advisory. Search by commit title and inspect the event's
 `git_commit` field before claiming auto-capture worked.
-<!-- <<< agent-memory-guardrails <<< -->
+<!-- <<< pollux <<< -->

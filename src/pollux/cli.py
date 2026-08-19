@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-from agent_memory_guardrails.constants import (
+from pollux.constants import (
     AGENT_BLOCK,
     AGENT_MARKER_END,
     AGENT_MARKER_START,
@@ -14,30 +14,32 @@ from agent_memory_guardrails.constants import (
     CLAUDE_MARKER_END,
     CLAUDE_MARKER_START,
     CLIENTS,
+    LEGACY_AGENT_MARKER2_END,
+    LEGACY_AGENT_MARKER2_START,
     LEGACY_AGENT_MARKER_END,
     LEGACY_AGENT_MARKER_START,
     PROFILES,
     RUNTIME_IGNORE_ENTRIES,
     VERSION,
 )
-from agent_memory_guardrails.doctor import run_doctor
-from agent_memory_guardrails.engine.bootstrap import initialize_memory
-from agent_memory_guardrails.engine.commands import Memory
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.hooks import install_hooks
-from agent_memory_guardrails.engine.storage import (
+from pollux.doctor import run_doctor
+from pollux.engine.bootstrap import initialize_memory
+from pollux.engine.commands import Memory
+from pollux.engine.errors import EngineError
+from pollux.engine.hooks import install_hooks
+from pollux.engine.storage import (
     discover_mem_dir,
     summary_path,
 )
-from agent_memory_guardrails.engine.summary import regenerate_summary
-from agent_memory_guardrails.files import (
-    GuardrailsFileError,
+from pollux.engine.summary import regenerate_summary
+from pollux.files import (
+    PolluxFileError,
     ensure_lines,
     read_text,
     set_marked_block,
 )
-from agent_memory_guardrails.render import render_client_config
-from agent_memory_guardrails.runtime import (
+from pollux.render import render_client_config
+from pollux.runtime import (
     discover_memory_root,
     resolve_python,
     validate_roots,
@@ -69,24 +71,24 @@ def _memory_root(args: argparse.Namespace, project_root: Path) -> Path:
 
 def _write_agent_files(project_root: Path, memory_root: Path) -> None:
     targets = {project_root, memory_root}
+    marker_generations = (
+        (AGENT_MARKER_START, AGENT_MARKER_END),
+        (LEGACY_AGENT_MARKER_START, LEGACY_AGENT_MARKER_END),
+        (LEGACY_AGENT_MARKER2_START, LEGACY_AGENT_MARKER2_END),
+    )
     for root in targets:
         agent_path = root / "AGENTS.md"
         agent_content = read_text(agent_path)
-        has_legacy = (
-            LEGACY_AGENT_MARKER_START in agent_content
-            or LEGACY_AGENT_MARKER_END in agent_content
-        )
-        has_current = AGENT_MARKER_START in agent_content or AGENT_MARKER_END in agent_content
-        if has_legacy and has_current:
-            raise GuardrailsFileError(
-                f"Both legacy and current Agent rule markers exist in {agent_path}."
+        present = [
+            pair
+            for pair in marker_generations
+            if pair[0] in agent_content or pair[1] in agent_content
+        ]
+        if len(present) > 1:
+            raise PolluxFileError(
+                f"Agent rule markers from multiple generations exist in {agent_path}."
             )
-        if has_legacy:
-            agent_start = LEGACY_AGENT_MARKER_START
-            agent_end = LEGACY_AGENT_MARKER_END
-        else:
-            agent_start = AGENT_MARKER_START
-            agent_end = AGENT_MARKER_END
+        agent_start, agent_end = present[0] if present else marker_generations[0]
         set_marked_block(
             agent_path,
             agent_start,
@@ -176,7 +178,7 @@ def _command_render(args: argparse.Namespace) -> int:
         _path(args.memory_root) if args.memory_root else discover_memory_root(project_root)
     )
     if memory_root is None:
-        raise EngineError("No memory root found. Pass --memory-root or run amguard init.")
+        raise EngineError("No memory root found. Pass --memory-root or run pollux init.")
     print(render_client_config(args.client, python, memory_root), end="")
     return 0
 
@@ -186,7 +188,7 @@ def _memory_for(args: argparse.Namespace) -> Memory:
     mem = discover_mem_dir(start)
     if mem is None:
         raise EngineError(
-            f"No .projectmem directory found in {start} or any parent. Run amguard init first."
+            f"No .projectmem directory found in {start} or any parent. Run pollux init first."
         )
     return Memory(mem)
 
@@ -256,7 +258,7 @@ def _command_regenerate(args: argparse.Namespace) -> int:
 
 
 def _command_search(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.search import format_result, search_events
+    from pollux.engine.search import format_result, search_events
 
     mem = _memory_for(args).mem_dir
     results = search_events(
@@ -275,7 +277,7 @@ def _command_search(args: argparse.Namespace) -> int:
         print(format_result(event))
     print(f"\n{len(results)} match(es){' (ranked)' if args.ranked else ''}")
     if not args.all:
-        from agent_memory_guardrails.engine.archive import archive_files
+        from pollux.engine.archive import archive_files
 
         if archive_files(mem):
             print("note: archived events excluded — add --all to include them",
@@ -284,7 +286,7 @@ def _command_search(args: argparse.Namespace) -> int:
 
 
 def _command_archive(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.archive import (
+    from pollux.engine.archive import (
         archive_status,
         run_archive,
         run_restore,
@@ -346,8 +348,8 @@ def _command_archive(args: argparse.Namespace) -> int:
 
 
 def _command_precheck(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.gitmeta import staged_files
-    from agent_memory_guardrails.engine.precheck import precheck_files
+    from pollux.engine.gitmeta import staged_files
+    from pollux.engine.precheck import precheck_files
 
     mem = _memory_for(args).mem_dir
     files = [path.replace("\\", "/") for path in args.files]
@@ -365,7 +367,7 @@ def _command_precheck(args: argparse.Namespace) -> int:
 
 
 def _command_context(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.context import generate_context
+    from pollux.engine.context import generate_context
 
     mem = _memory_for(args).mem_dir
     result = generate_context(
@@ -384,7 +386,7 @@ def _command_context(args: argparse.Namespace) -> int:
 
 
 def _command_capture(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.capture import capture_commit, capture_merge
+    from pollux.engine.capture import capture_commit, capture_merge
 
     repo_root = _path(args.repo_root)
     capture = capture_commit if args.trigger == "commit" else capture_merge
@@ -398,7 +400,7 @@ def _command_capture(args: argparse.Namespace) -> int:
 
 
 def _command_hooks(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.hooks import install_hooks, uninstall_hooks
+    from pollux.engine.hooks import install_hooks, uninstall_hooks
 
     repo_root = _path(args.repo)
     if args.action == "install":
@@ -411,7 +413,7 @@ def _command_hooks(args: argparse.Namespace) -> int:
 
 
 def _command_dossier(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.dossier import (
+    from pollux.engine.dossier import (
         DossierError,
         build_dossier,
         git_repo_root,
@@ -437,7 +439,7 @@ def _command_dossier(args: argparse.Namespace) -> int:
             for error in errors:
                 print(f"- {error}")
             return 1
-        from agent_memory_guardrails.engine.dossier import load_index
+        from pollux.engine.dossier import load_index
 
         index = load_index(index_path)
         print("# File-card validation: PASSED\n")
@@ -463,20 +465,20 @@ def _command_dossier(args: argparse.Namespace) -> int:
             )
         )
     except DossierError as exc:
-        print(f"amguard: error: {exc}", file=sys.stderr)
+        print(f"pollux: error: {exc}", file=sys.stderr)
         return 2
     return 0
 
 
 def _command_mcp(_args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.mcp_server import main as mcp_main
+    from pollux.engine.mcp_server import main as mcp_main
 
     mcp_main()  # blocks, serving stdio JSON-RPC
     return 0
 
 
 def _command_backup(args: argparse.Namespace) -> int:
-    from agent_memory_guardrails.engine.backup import default_backup_dir, run_backup, verify_backup
+    from pollux.engine.backup import default_backup_dir, run_backup, verify_backup
 
     if args.verify:
         manifest = verify_backup(_path(args.verify))
@@ -498,7 +500,7 @@ def _command_backup(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="amguard",
+        prog="pollux",
         description="Safe setup and diagnostics for local-first AI project memory.",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
@@ -621,7 +623,7 @@ def build_parser() -> argparse.ArgumentParser:
     backup = subparsers.add_parser(
         "backup", help="Snapshot the whole memory into a verified zip."
     )
-    backup.add_argument("--to", help="Destination directory (default: ~/.amguard/backups/<name>).")
+    backup.add_argument("--to", help="Destination directory (default: ~/.pollux/backups/<name>).")
     backup.add_argument(
         "--verify",
         help="Verify an existing backup zip and print its manifest.",
@@ -690,8 +692,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.handler(args))
-    except (GuardrailsFileError, EngineError, ValueError) as exc:
-        print(f"amguard: error: {exc}", file=sys.stderr)
+    except (PolluxFileError, EngineError, ValueError) as exc:
+        print(f"pollux: error: {exc}", file=sys.stderr)
         return 2
 
 

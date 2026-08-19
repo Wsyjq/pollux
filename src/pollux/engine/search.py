@@ -7,8 +7,8 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agent_memory_guardrails.engine.models import Event
-from agent_memory_guardrails.engine.storage import read_events_lenient
+from pollux.engine.models import Event
+from pollux.engine.storage import read_events_lenient
 
 
 def _event_matches(event: Event, matcher) -> bool:
@@ -39,7 +39,7 @@ def search_events(
     event files."""
     events, _skipped = read_events_lenient(mem)
     if include_archived:
-        from agent_memory_guardrails.engine.archive import read_archived_events
+        from pollux.engine.archive import read_archived_events
 
         events = events + read_archived_events(mem)
     if regex:

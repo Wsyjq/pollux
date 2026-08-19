@@ -13,7 +13,7 @@ from pathlib import Path
 
 from support import init_memory
 
-from agent_memory_guardrails.engine.dossier import (
+from pollux.engine.dossier import (
     DossierError,
     build_dossier,
     extract_card_section,
@@ -229,13 +229,13 @@ class BuildDossierTests(DossierRepoCase):
 
 class EngineMemoryIntegrationTests(DossierRepoCase):
     def test_native_loader_reads_parent_memory(self) -> None:
-        from agent_memory_guardrails.engine.dossier import engine_memory_loader
+        from pollux.engine.dossier import engine_memory_loader
 
         base = Path(self._tmp.name)
         mem = init_memory(base)  # parent of the repo owns the memory
         from support import write_events
 
-        from agent_memory_guardrails.engine.models import Event
+        from pollux.engine.models import Event
 
         write_events(
             mem,

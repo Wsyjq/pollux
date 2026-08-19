@@ -19,9 +19,9 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agent_memory_guardrails.engine.errors import EngineError
-from agent_memory_guardrails.engine.locking import DirLock
-from agent_memory_guardrails.engine.storage import EVENTS_FILE, read_events_lenient
+from pollux.engine.errors import EngineError
+from pollux.engine.locking import DirLock
+from pollux.engine.storage import EVENTS_FILE, read_events_lenient
 
 _MANIFEST_NAME = "MANIFEST.json"
 _SKIP_DIRS = {"write.lock", "cache"}
@@ -37,7 +37,7 @@ class BackupReport:
 
 
 def default_backup_dir(memory_root: Path) -> Path:
-    return Path.home() / ".amguard" / "backups" / memory_root.name
+    return Path.home() / ".pollux" / "backups" / memory_root.name
 
 
 def run_backup(mem: Path, dest_dir: Path | None = None) -> BackupReport:

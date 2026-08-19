@@ -6,8 +6,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from agent_memory_guardrails.files import (
-    GuardrailsFileError,
+from pollux.files import (
+    PolluxFileError,
     ensure_lines,
     managed_hook_block,
     set_marked_block,
@@ -22,7 +22,7 @@ class FileOperationsTests(unittest.TestCase):
             path.write_text("old\n", encoding="utf-8")
             existing_mode = stat.S_IMODE(path.stat().st_mode)
 
-            with patch("agent_memory_guardrails.files.os.chmod") as chmod:
+            with patch("pollux.files.os.chmod") as chmod:
                 write_text_atomic(path, "new\n")
 
             chmod.assert_called_once_with(path, existing_mode)
@@ -66,7 +66,7 @@ class FileOperationsTests(unittest.TestCase):
             with self.subTest(content=content), tempfile.TemporaryDirectory() as temp:
                 path = Path(temp) / "AGENTS.md"
                 path.write_text(content, encoding="utf-8")
-                with self.assertRaises(GuardrailsFileError):
+                with self.assertRaises(PolluxFileError):
                     set_marked_block(
                         path,
                         "<!-- start -->",
@@ -93,9 +93,9 @@ class FileOperationsTests(unittest.TestCase):
         block = managed_hook_block(content, start, end)
         self.assertTrue(block.startswith(start))
         self.assertTrue(block.endswith(end))
-        with self.assertRaises(GuardrailsFileError):
+        with self.assertRaises(PolluxFileError):
             managed_hook_block(f"{start}\nbroken\n", start, end)
-        with self.assertRaises(GuardrailsFileError):
+        with self.assertRaises(PolluxFileError):
             managed_hook_block(f"{end}\n{start}\n", start, end)
 
 

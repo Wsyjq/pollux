@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Agent Memory Guardrails is evolving from a governance layer around the third-party
+Pollux is evolving from a governance layer around the third-party
 `projectmem` engine into a complete, self-owned project-level memory system. The engine
-under `src/agent_memory_guardrails/engine/` keeps the on-disk format contract of
+under `src/pollux/engine/` keeps the on-disk format contract of
 `.projectmem/` (append-only `events.jsonl` with six typed events, derived `summary.md`
 and `issues/`, hand-maintained `PROJECT_MAP.md` / `plan.md`), so existing memories —
 including a 1,259-event family root — carry over without migration.
@@ -19,7 +19,7 @@ maintenance burden of a divergent fork.
 ## Components (0.2.x — engine self-owned, upstream dependency removed)
 
 ```text
-amguard CLI
+pollux CLI
   |-- init ------> engine bootstrap (in-process, idempotent skeleton)
   |
   |-- log/attempt/fix/decision/note ----> engine.commands (Memory)
@@ -40,7 +40,7 @@ amguard CLI
   |
   |-- mcp -------------------------------> engine.mcp_server (15 same-named tools)
   |
-  |-- render ----> client config renderer (points at the amguard MCP entry)
+  |-- render ----> client config renderer (points at the pollux MCP entry)
   |
   `-- doctor ----> policy checks + engine health (legacy-hook hints, runtime drift)
 ```
@@ -51,7 +51,7 @@ amguard CLI
 |---|---|
 | `cli.py` | Argument parsing and command orchestration |
 | `runtime.py` | Interpreter resolution, root discovery, profile/root contract |
-| `engine/bootstrap.py` | Idempotent memory skeleton + amguard AI instructions |
+| `engine/bootstrap.py` | Idempotent memory skeleton + pollux AI instructions |
 | `engine/models.py` | Event model; byte-compatible serialization; CJK slugs |
 | `engine/storage.py` | Root discovery, locked appends, issue ids, config parsing |
 | `engine/locking.py` | Atomic-mkdir cross-process lock with stale takeover |
@@ -93,7 +93,7 @@ and an explicit `PYTHONIOENCODING` setting retain their chosen encoding.
 
 The memory engine owns append-only events and derived summaries/issues (upstream
 `projectmem` until M6, the own `engine/` package afterwards — same format either way).
-Contributors own the current project map and plan. `amguard` owns only its marked
+Contributors own the current project map and plan. `pollux` owns only its marked
 instruction blocks and recommended ignore entries.
 
 ## Profiles
@@ -109,7 +109,7 @@ Memory and Git share a root, but the complete `.projectmem/` directory is ignore
 
 ### Family
 
-Several related repositories share an ancestor memory root. `amguard` writes Agent instructions
+Several related repositories share an ancestor memory root. `pollux` writes Agent instructions
 to both roots, rejects unsupported hooks, and keeps one event history by explicit choice.
 
 ## Failure behavior
