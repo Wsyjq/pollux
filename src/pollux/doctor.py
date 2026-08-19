@@ -15,6 +15,7 @@ from pollux.constants import (
 )
 from pollux.engine.errors import EngineError
 from pollux.engine.hooks import HOOK_MARKER_END, HOOK_MARKER_START
+from pollux.engine.storage import lexical_abs
 from pollux.files import (
     PolluxFileError,
     has_exact_line,
@@ -212,7 +213,7 @@ def _check_opencode(report: DoctorReport) -> None:
         return
     try:
         root_index = command.index("--root")
-        configured_root = Path(command[root_index + 1]).expanduser().resolve()
+        configured_root = lexical_abs(Path(command[root_index + 1]).expanduser())
     except (ValueError, IndexError, OSError):
         configured_root = None
     if configured_root != report.memory_root:
@@ -233,9 +234,9 @@ def run_doctor(
     memory_root: Path | None = None,
     scan_secrets_enabled: bool = True,
 ) -> DoctorReport:
-    project_root = project_root.expanduser().resolve()
+    project_root = lexical_abs(project_root.expanduser())
     discovered = (
-        memory_root.expanduser().resolve()
+        lexical_abs(memory_root.expanduser())
         if memory_root
         else discover_memory_root(project_root)
     )

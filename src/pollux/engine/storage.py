@@ -53,9 +53,20 @@ def _is_project_mem_dir(candidate: Path) -> bool:
     return candidate.is_dir() and (candidate / CONFIG_FILE).exists()
 
 
+def lexical_abs(value: Path | str) -> Path:
+    """Absolute, ``..``-collapsed path that keeps symlinks unresolved.
+
+    Discovery and reported roots must stay in the caller's path form: macOS
+    temp dirs live under the /var symlink and Windows CI runners use 8.3
+    short names, and resolving either would break comparisons against the
+    paths users, configs, and tests actually hold.
+    """
+    return Path(os.path.abspath(os.fspath(value)))
+
+
 def discover_mem_dir(start: Path | None = None) -> Path | None:
     """Walk up from ``start`` looking for an initialized ``.projectmem/``."""
-    current = (start or Path.cwd()).resolve()
+    current = lexical_abs(start or Path.cwd())
     for path in [current, *current.parents]:
         candidate = path / MEM_DIR
         if _is_project_mem_dir(candidate):
@@ -73,7 +84,7 @@ def require_mem_dir(root: Path | None = None) -> Path:
 
     env_root = os.environ.get("PROJECTMEM_ROOT")
     if env_root:
-        path = Path(env_root).expanduser().resolve() / MEM_DIR
+        path = lexical_abs(Path(env_root).expanduser()) / MEM_DIR
         if path.is_dir():
             return path
         raise EngineError(

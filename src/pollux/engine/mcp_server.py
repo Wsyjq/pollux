@@ -34,10 +34,10 @@ def _resolve_mem_dir() -> Path | None:
     if "--root" in sys.argv:
         index = sys.argv.index("--root")
         if index + 1 < len(sys.argv):
-            return discover_mem_dir(Path(sys.argv[index + 1]).expanduser().resolve())
+            return discover_mem_dir(Path(sys.argv[index + 1]).expanduser())
     env_root = os.environ.get("PROJECTMEM_ROOT")
     if env_root:
-        return discover_mem_dir(Path(env_root).expanduser().resolve())
+        return discover_mem_dir(Path(env_root).expanduser())
     return discover_mem_dir()
 
 

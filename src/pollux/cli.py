@@ -29,6 +29,7 @@ from pollux.engine.errors import EngineError
 from pollux.engine.hooks import install_hooks
 from pollux.engine.storage import (
     discover_mem_dir,
+    lexical_abs,
     summary_path,
 )
 from pollux.engine.summary import regenerate_summary
@@ -58,7 +59,7 @@ def _configure_stream(stream: object) -> None:
 
 
 def _path(value: str) -> Path:
-    return Path(value).expanduser().resolve()
+    return lexical_abs(Path(value).expanduser())
 
 
 def _memory_root(args: argparse.Namespace, project_root: Path) -> Path:

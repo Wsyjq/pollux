@@ -19,6 +19,7 @@ from pollux.engine.storage import (
     discover_mem_dir,
     get_git_commit,
     latest_open_issue_within,
+    lexical_abs,
     next_issue_id,
     read_current_issue,
     read_events,
@@ -39,7 +40,7 @@ class Memory:
         found = discover_mem_dir(start)
         if found is None:
             raise EngineError(
-                f"No .projectmem directory found in {(start or Path.cwd()).resolve()} "
+                f"No .projectmem directory found in {lexical_abs(start or Path.cwd())} "
                 f"or any parent. Run pollux init first."
             )
         return cls(found)
