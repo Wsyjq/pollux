@@ -19,7 +19,7 @@
 
 - 明确区分不可手改的历史层与需要直接维护的当前地图/计划。
 - 不默认开启尚未验证的 hook 与全局继承。
-- 为 OpenCode、ZCode、Claude、Cursor、Codex 生成一致配置。
+- 为 OpenCode、ZCode、Claude、Cursor、Codex、DSH 生成一致配置。
 - 用 doctor 核实记忆根、隐私策略、hook、Agent 规则和潜在密钥泄漏。
 - 真正的项目族模式：记忆锚定在多个仓库的父目录，向上发现、跨进程锁、
   父目录锚定的自动捕获都可用。

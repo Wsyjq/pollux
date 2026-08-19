@@ -37,7 +37,7 @@ more than storage:
 
 - `pollux init`: idempotent memory bootstrap with conservative defaults.
 - `pollux doctor`: structured configuration, privacy, hook, and secret audit.
-- `pollux render`: client-specific MCP configuration for five AI clients.
+- `pollux render`: client-specific MCP configuration for six AI clients.
 - Memory commands with upstream-compatible semantics: `log`, `attempt`, `fix`,
   `decision`, `note`, `show`, `search`, `precheck`, `context`, `regenerate`.
 - `pollux archive`: reversible lifecycle for closed, old issues and (opt-in)
@@ -119,7 +119,7 @@ before adding automation.
 ```text
 pollux init [PATH] [--profile team|private|family] [--enable-hooks]
 pollux doctor [PATH] [--profile auto|team|private|family] [--json]
-pollux render opencode|zcode|claude|cursor|codex [PATH]
+pollux render opencode|zcode|claude|cursor|codex|dsh [PATH]
 pollux log|attempt|fix|decision|note <text> [--at loc] [--root DIR]
 pollux show|regenerate [--root DIR]
 pollux search <query> [--regex] [--failed-only] [--all]
