@@ -6,6 +6,7 @@
 .projectmem/precheck.snooze
 .projectmem/viz.html
 .venv/
+.venv-mcp/
 __pycache__/
 *.py[cod]
 *.egg-info/
