@@ -18,6 +18,8 @@ governance, diagnostics, and per-file dossiers in one package.
 
 [简体中文](./README.zh-CN.md)
 
+[![CI](https://github.com/Wsyjq/pollux/actions/workflows/ci.yml/badge.svg)](https://github.com/Wsyjq/pollux/actions/workflows/ci.yml)
+
 ## Why this exists
 
 Memory tools can create files and expose MCP commands, but a reliable engineering workflow needs

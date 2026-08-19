@@ -13,6 +13,8 @@
 
 [English](./README.md)
 
+[![CI](https://github.com/Wsyjq/pollux/actions/workflows/ci.yml/badge.svg)](https://github.com/Wsyjq/pollux/actions/workflows/ci.yml)
+
 ## 它解决什么问题
 
 记忆引擎可以保存事件、生成摘要和暴露 MCP 工具，但稳定工程流程还需要：
