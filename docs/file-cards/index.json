@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "repositoryId": "agent-memory-guardrails",
+  "cards": [
+    {
+      "path": "agent-memory-guardrails/src/agent_memory_guardrails/engine/commands.py",
+      "card": "docs/file-cards/engine.md",
+      "tier": "A",
+      "verifiedCommit": "63070b8d03226f9caa40641a40f5742b3fb3b9a2",
+      "verifiedBlob": "16eb48fadd7df6dbabf5bbb98ebdc0a20df189b9"
+    },
+    {
+      "path": "agent-memory-guardrails/src/agent_memory_guardrails/engine/summary.py",
+      "card": "docs/file-cards/engine.md",
+      "tier": "A",
+      "verifiedCommit": "63070b8d03226f9caa40641a40f5742b3fb3b9a2",
+      "verifiedBlob": "77f4840bed7e6d61ef9adf30873a9e6667165842"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-memory-guardrails"
+version = "0.2.0a1"
+description = "Self-contained local-first project memory for AI coding agents: own engine, governance, diagnostics, and per-file dossiers."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Agent Memory Guardrails contributors" }]
+keywords = ["ai", "coding-agent", "mcp", "memory", "projectmem", "guardrails", "dossier"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = ["mcp>=1.2,<2"]
+
+[project.optional-dependencies]
+dev = ["build>=1.2", "ruff>=0.6", "twine>=6"]
+
+[project.scripts]
+amguard = "agent_memory_guardrails.cli:main"
+amguard-mcp = "agent_memory_guardrails.engine.mcp_server:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
