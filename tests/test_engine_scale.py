@@ -6,6 +6,7 @@ fails if it is drastically off. Measured values are always printed.
 """
 from __future__ import annotations
 
+import sys
 import tempfile
 import time
 import unittest
@@ -16,6 +17,14 @@ from support import init_memory, write_events
 from pollux.engine.commands import Memory
 from pollux.engine.models import Event
 from pollux.engine.summary import regenerate_summary
+
+# Timing gates keep a 3x margin over local dev measurements; Windows CI
+# runners are several times slower on filesystem-heavy work, so widen the
+# budget there. A complexity regression at 1500 events still lands far
+# outside either budget.
+_WINDOWS = sys.platform == "win32"
+REGEN_GATE = 15.0 if _WINDOWS else 6.0
+SINGLE_WRITE_GATE = 6.0 if _WINDOWS else 3.0
 
 
 def _scale_corpus() -> list[Event]:
@@ -87,7 +96,7 @@ class ScaleTests(unittest.TestCase):
         print(f"\n[cold regen 1500 events] {elapsed:.3f}s "
               f"(written={stats.issues_written}, untouched={stats.issue_files_untouched})")
         self.assertEqual(stats.issues_written, 300)
-        self.assertLess(elapsed, 6.0)  # target 2s, 3x margin
+        self.assertLess(elapsed, REGEN_GATE)  # target 2s, 3x margin
 
     def test_single_write_under_gate(self) -> None:
         regenerate_summary(self.mem)  # steady state: files already in place
@@ -98,7 +107,7 @@ class ScaleTests(unittest.TestCase):
         print(f"\n[single add_note at 1501 events] {elapsed:.3f}s")
         events = read_lenient(self.mem)
         self.assertEqual(len(events), 1501)
-        self.assertLess(elapsed, 3.0)  # target 1s, 3x margin
+        self.assertLess(elapsed, SINGLE_WRITE_GATE)  # target 1s, 3x margin
 
 
 def read_lenient(mem: Path) -> list[Event]:
