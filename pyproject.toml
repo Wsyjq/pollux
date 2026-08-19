@@ -23,6 +23,12 @@ classifiers = [
 ]
 dependencies = ["mcp>=1.2,<2"]
 
+[project.urls]
+Homepage = "https://github.com/Wsyjq/pollux"
+Repository = "https://github.com/Wsyjq/pollux"
+Issues = "https://github.com/Wsyjq/pollux/issues"
+Changelog = "https://github.com/Wsyjq/pollux/blob/main/CHANGELOG.md"
+
 [project.optional-dependencies]
 dev = ["build>=1.2", "ruff>=0.6", "twine>=6"]
 
