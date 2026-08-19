@@ -8,6 +8,11 @@ release.
 
 ## [Unreleased]
 
+## [0.2.0a1] - 2026-08-19
+
+First public release, under the name Pollux; earlier local alphas were never
+published.
+
 ### Changed
 
 - **Renamed to Pollux** (previously `agent-memory-guardrails`, CLI `amguard`).
@@ -19,6 +24,17 @@ release.
   place; markers from mixed generations fail closed. Naming: Pollux is
   Gemini's immortal twin — `events.jsonl` is mortal Castor, the distilled
   `summary.md` lives on.
+- **The engine is now self-owned.** The runtime dependency on third-party
+  `projectmem` is removed (only `mcp>=1.2,<2` remains). The on-disk format is
+  unchanged and verified byte-compatible: regenerating a real 1,263-event
+  memory produces a byte-identical `summary.md`.
+- `pollux init` bootstraps the memory in-process (idempotent skeleton,
+  pollux-authored `AI_INSTRUCTIONS.md`) instead of shelling out upstream.
+- `pollux render` points clients at the pollux MCP server (key `pollux`).
+- Family mode now supports git hooks (our hooks resolve the memory by walking
+  up from the Git root); the historical limitation no longer applies.
+- Doctor: version findings replaced by engine presence checks, pollux hook
+  audits, and legacy projectmem hook migration hints.
 
 ### Added
 
@@ -39,25 +55,6 @@ release.
 - Ranked search: `search_events` (MCP) ranks by relevance — open-issue
   events, unresolved failures, recency, and file-path hits first; CLI gains
   `--ranked`. Default order stays log order for compatibility.
-
-## [0.2.0a1] - 2026-08-15
-
-### Changed
-
-- **The engine is now self-owned.** The runtime dependency on third-party
-  `projectmem` is removed (only `mcp>=1.2,<2` remains). The on-disk format is
-  unchanged and verified byte-compatible: regenerating a real 1,263-event
-  memory produces a byte-identical `summary.md`.
-- `pollux init` bootstraps the memory in-process (idempotent skeleton,
-  pollux-authored `AI_INSTRUCTIONS.md`) instead of shelling out upstream.
-- `pollux render` points clients at the pollux MCP server (key `pollux`).
-- Family mode now supports git hooks (our hooks resolve the memory by walking
-  up from the Git root); the historical limitation no longer applies.
-- Doctor: version findings replaced by engine presence checks, pollux hook
-  audits, and legacy projectmem hook migration hints.
-
-### Added
-
 - Memory commands with upstream-compatible semantics: `log`, `attempt`,
   `fix`, `decision`, `note`, `show`, `regenerate`.
 - Query layer: `search` (matches `git_commit`/`git_message`; `--all` covers
