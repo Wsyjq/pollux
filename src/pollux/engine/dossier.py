@@ -277,11 +277,15 @@ def validate_index(repo_root: Path, index_path: Path) -> list[str]:
                 f"actual={actual.stdout.strip()}"
             )
 
-    cards_root = index_path.parent
+    # The index may sit under a symlinked (macOS /var) or 8.3-short-named
+    # (Windows CI runner) temp path while root is resolved; scan from the
+    # resolved index so rglob paths stay comparable to root.
+    resolved_index = index_path.resolve()
+    cards_root = resolved_index.parent
     heading_locations: dict[str, list[str]] = {}
     if cards_root.is_dir():
         for card_path in cards_root.rglob("*.md"):
-            if card_path == index_path:
+            if card_path == resolved_index:
                 continue
             relative_card = card_path.relative_to(root).as_posix()
             for line_number, line in enumerate(
