@@ -67,6 +67,32 @@ pollux mcp                                               # 15 工具 MCP 服务�
 
 `family` 模式的 hook 由 pollux 自有 hook 支持：从 Git 根向上发现记忆，父目录锚定可用。
 
+## 记忆文件放在哪里
+
+`pollux init` 只写记忆根和两份规则文件，不会在仓库里写其他任何东西。
+`team`/`private` 档的记忆根就是 `<仓库>/.projectmem/`；`family` 档是公共
+父目录的 `.projectmem/`，由各仓库向上发现共用。
+
+```text
+<repo>/                      # team/private：仓库本身；family：公共父目录
+├── AGENTS.md                # 治理规则（标记块）              — 提交
+├── CLAUDE.md                # 同一规则块的 Claude 版           — 提交
+└── .projectmem/             # 记忆根
+    ├── events.jsonl         # 只增的原始历史                  — 永不提交
+    ├── summary.md           # 派生摘要                        — team 档提交
+    ├── issues/              # 派生的 issue 档案               — team 档提交
+    ├── PROJECT_MAP.md       # 当前结构（手工维护）
+    ├── plan.md              # 当前意图（手工维护）
+    ├── config.toml          # 记忆配置
+    ├── AI_INSTRUCTIONS.md   # Agent 工作流说明
+    ├── archive/             # 可逆归档（pollux archive）
+    └── cache/, write.lock   # 运行时状态                      — 永不提交
+```
+
+所有策略都忽略原始事件与运行时文件；`private` 档忽略整个 `.projectmem/`；
+`team` 档提交蒸馏文件（摘要、issue、地图、计划、配置、说明）。Git hook 仅在
+`--enable-hooks` 时安装到 `<repo>/.git/hooks/`。
+
 ## 默认安全边界
 
 `pollux init` 保持自动化可选：Git hook 需 `--enable-hooks`（或 `pollux hooks install`）；

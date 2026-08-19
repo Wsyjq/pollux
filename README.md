@@ -105,6 +105,35 @@ Hooks in family mode are supported: `pollux`'s own hooks resolve the memory
 by walking up from the Git root, so `--enable-hooks` works with a parent
 memory root.
 
+## Where the memory lives
+
+`pollux init` writes only the memory root and the two rule files — nothing
+else in your repository. In the team and private profiles the memory root is
+`<repo>/.projectmem/`; in the family profile it is the `.projectmem/` of the
+shared parent directory, discovered by walking up from each repository.
+
+```text
+<repo>/                      # team/private: the repository; family: the shared parent
+├── AGENTS.md                # governance rules, marked block          — committed
+├── CLAUDE.md                # the same rules for Claude               — committed
+└── .projectmem/             # the memory root
+    ├── events.jsonl         # append-only raw history                — never committed
+    ├── summary.md           # derived digest                          — committed in team
+    ├── issues/              # derived per-issue history               — committed in team
+    ├── PROJECT_MAP.md       # current structure, hand-maintained
+    ├── plan.md              # current intent, hand-maintained
+    ├── config.toml          # memory configuration
+    ├── AI_INSTRUCTIONS.md   # agent workflow instructions
+    ├── archive/             # reversible archive (pollux archive)
+    └── cache/, write.lock   # runtime state                           — never committed
+```
+
+Every profile ignores the raw event log and runtime state; the private profile
+ignores the whole `.projectmem/` directory; the team profile commits the
+distilled files (summary, issues, map, plan, configuration, instructions).
+Git hooks are only installed under `<repo>/.git/hooks/` and only with
+`--enable-hooks`.
+
 ## Conservative defaults
 
 `pollux init` keeps automation opt-in: Git hooks require `--enable-hooks`
