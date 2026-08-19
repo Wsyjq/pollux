@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import os
 import sys
+import sysconfig
 from pathlib import Path
 
 from pollux.files import PolluxFileError, set_marked_block
@@ -49,17 +50,23 @@ fi
 
 
 def pollux_entry_path() -> str:
-    """Absolute POSIX-style path to the pollux CLI beside this interpreter.
+    """Absolute POSIX-style path to this interpreter's pollux CLI entry.
+
+    venv layouts put the entry beside the interpreter; system installs use a
+    sibling ``Scripts`` directory (Windows) that sysconfig reports, so probe
+    the authoritative scripts location first.
 
     Baked into installed hooks so they cannot silently switch to a different
     install via PATH (the same reasoning as the PJM_BIN pinning upstream of
     this project's governance work).
     """
-    scripts_dir = Path(sys.executable).parent
-    for name in ("pollux.exe", "pollux"):
-        candidate = scripts_dir / name
-        if candidate.exists():
-            return candidate.resolve().as_posix()
+    scripts_dir = Path(sysconfig.get_path("scripts") or Path(sys.executable).parent)
+    beside = Path(sys.executable).parent
+    for directory in (scripts_dir, beside):
+        for name in ("pollux.exe", "pollux"):
+            candidate = directory / name
+            if candidate.exists():
+                return candidate.resolve().as_posix()
     return "pollux"  # PATH fallback; doctor flags this as drift-prone
 
 
